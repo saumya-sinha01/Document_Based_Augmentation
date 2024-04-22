@@ -1,45 +1,95 @@
-import os
-import json
+import os, cv2, json
+from collections import defaultdict
+
 from doctr.io import DocumentFile
 from doctr.models import ocr_predictor
 from ultralyticsplus import YOLO, render_result
 
 
 class TextExtraction:
-    def __init__(self):
-        self.yolo_model = YOLO('keremberke/yolov8m-table-extraction')
-        #self.yolo_model = YOLO('yolov8n.pt')
 
-        # set model parameters
+    processed_image = None
+    def __init__(self):
+        self.image_upload_folder = 'static\\uploads\\'
+        os.environ['USE_TORCH'] = '1'
+
+        #Initialize and Set Model Parameters...
+        self.yolo_model = YOLO('keremberke/yolov8m-table-extraction')
         self.yolo_model.overrides['conf'] = 0.25  # NMS confidence threshold
         self.yolo_model.overrides['iou'] = 0.45  # NMS IoU threshold
         self.yolo_model.overrides['agnostic_nms'] = False  # NMS class-agnostic
         self.yolo_model.overrides['max_det'] = 1000  # maximum number of detections per image
 
-    def processImage(self, image):
+        #Initialize OCR Predictor
+        self.predictor = ocr_predictor(pretrained=True)
 
+    def search(self, searchText):
+        if not searchText:
+            return False
+
+        searchText = searchText.lower()
+        if searchText in self.dict:
+            return True
+
+        return False
+
+    def processImage(self, input_image):
+        self.processed_image = input_image
 
         # perform inference
-        results = self.yolo_model.predict(image)
+        results = self.yolo_model.predict(input_image)
 
-        # observe results
-        print('Boxes: ', results[0].boxes)
-        render = render_result(model=self.yolo_model, image=image, result=results[0])
-        render.show()
+        #Load the image:
+        original_image = cv2.imread(input_image)
 
-        # parsed_json_list = []
-        # for result in results:
-        #     json = self.extractText(result)
-        #     print(f'Parse Json: {json}')
-        #     parsed_json_list.append(json)
+        #Extract the filename..
+        image_file_name = input_image.replace(self.image_upload_folder, '').replace('.png', '')
 
+        parsed_json_list = []
+        result_count = 0
+        box_count = 0
+        for result in results:
+            result_count += 1
+            for captured_box in result.boxes:
+                box_count += 1
+                box = captured_box.xyxy
 
-    def extractText(self, result):
-        # Instantiate a pretrained model
-        predictor = ocr_predictor(pretrained=True)
+                # Extract the coordinates of the top-left and bottom-right corners
+                x1, y1, x2, y2 = map(int, box[0])
+                cropped_image = original_image[y1:y2, x1:x2]
+
+                # Save or display the cropped image
+                cropped_image_filename = self.image_upload_folder + image_file_name + '_' + str(result_count) + '_' + str(box_count) + '.png'
+                cv2.imwrite(cropped_image_filename, cropped_image)
+
+                extracted_json = self.extractText(cropped_image_filename)
+                self.parse_extracted_json(extracted_json)
+                # print(f'Parse Json: {extracted_json}')
+                # parsed_json_list.append(extracted_json)
+
+        # print(f'Parsed Json Size: {len(parsed_json_list)}')
+
+    def parse_extracted_json(self, extracted_json):
+        self.dict = defaultdict()
+        dict = json.loads(extracted_json)
+        value_dict = dict['pages'][0]
+        block_list = value_dict['blocks']
+        for block_value in block_list:
+            word_dict_list = block_value['lines'][0]
+            word_list = word_dict_list['words']
+            for word_dict in word_list:
+                word_value = word_dict['value'].lower()
+                if word_value in self.dict:
+                    self.dict[word_value].append(word_dict)
+                else:
+                    self.dict[word_value] = [word_dict]
+
+    def extractText(self, cropped_table_image):
+        # Read the file
+        doc = DocumentFile.from_images(cropped_table_image)
 
         # Perform OCR on the document
-        result = predictor(result)
+        result = self.predictor(doc)
 
         # JSON export
         json_export = result.export()

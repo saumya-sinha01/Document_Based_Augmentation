@@ -4,14 +4,9 @@ import os
 
 from TextExtraction import TextExtraction
 
-#from TextExtraction import TextExtraction
-
 app = Flask(__name__)
-
 upload_folder = os.path.join('static', 'uploads')
-
 app.config['UPLOAD'] = upload_folder
-
 textExtraction = TextExtraction()
 
 @app.route('/', methods=['GET', 'POST'])
@@ -20,9 +15,21 @@ def upload_file():
         file = request.files['img']
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD'], filename))
-        img = os.path.join(app.config['UPLOAD'], filename)
-        print(f"Uploaded Image: {img}")
+        input_image = os.path.join(app.config['UPLOAD'], filename)
 
-        textExtraction.processImage(img)
-        return render_template('image_render.html', img=img)
+        textExtraction.processImage(input_image)
+        return render_template('image_render.html', img=input_image)
+
     return render_template('image_render.html')
+
+@app.route('/searchtext', methods=['POST'])
+def search():
+    searchText = request.form['searchText']
+    input_image = textExtraction.processed_image
+
+    if textExtraction.search(searchText):
+        return render_template('image_render.html', foundText='Text Found!', img=input_image, searchText=searchText)
+    else:
+        return render_template('image_render.html', foundText='Not Found!', img=input_image, searchText=searchText)
+
+
