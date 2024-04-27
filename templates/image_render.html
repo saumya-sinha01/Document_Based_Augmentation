@@ -51,7 +51,7 @@
 <h1>Rendered Image</h1>
 <img src="{{img}}">
 {% else %}
-<h1>Image will be render here...</h1>
+<h1>Image will  render here...</h1>
 {% endif %}
 <br>
 
@@ -75,10 +75,10 @@
         </form>
 	</tr>
 	<tr>
-        <form action='remove-text' method='GET'>
+        <form action='/removeText' method='POST'>
 		<td>Remove:</td>
 		<td>
-			<input type="text" id="remove" name="remove" value="Text to be Removed" style="display: inline-block;">
+			<input type="text" id="removeText" name="removeText" value="Text to be Removed" style="display: inline-block;">
 		</td>
 		<td>
 			<input type="submit" value="Remove">

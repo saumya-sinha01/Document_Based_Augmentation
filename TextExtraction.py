@@ -13,6 +13,11 @@ class TextExtraction:
         self.image_upload_folder = 'static\\uploads\\'
         os.environ['USE_TORCH'] = '1'
 
+        self.extracted_json_list = []
+        self.cropped_image_files = []
+        self.full_image_json = None
+        self.image_file_name = None
+
         #Initialize and Set Model Parameters...
         self.yolo_model = YOLO('keremberke/yolov8m-table-extraction')
         self.yolo_model.overrides['conf'] = 0.25  # NMS confidence threshold
@@ -35,6 +40,7 @@ class TextExtraction:
 
     def processImage(self, input_image):
         self.processed_image = input_image
+
 
         # perform inference
         results = self.yolo_model.predict(input_image)
@@ -63,11 +69,9 @@ class TextExtraction:
                 cv2.imwrite(cropped_image_filename, cropped_image)
 
                 extracted_json = self.extractText(cropped_image_filename)
+                self.extracted_json_list.append(extracted_json)
+                self.cropped_image_files.append(cropped_image_filename)
                 self.parse_extracted_json(extracted_json)
-                # print(f'Parse Json: {extracted_json}')
-                # parsed_json_list.append(extracted_json)
-
-        # print(f'Parsed Json Size: {len(parsed_json_list)}')
 
     def parse_extracted_json(self, extracted_json):
         self.dict = defaultdict()
