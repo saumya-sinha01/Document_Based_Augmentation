@@ -1,15 +1,29 @@
 import json
 import math
-import os
 
-import self
-
-from TextExtraction import TextExtraction
 from PIL import Image, ImageDraw, ImageFont
-from collections import defaultdict
 
 class Data_Augmentation:
-    textExtraction = TextExtraction()
+
+    def __init__(self):
+        self.image_upload_folder = 'static\\uploads\\'
+
+    def removeTextFromFullImage(self, text_to_be_removed, extracted_json, original_image_file):
+        original_image = Image.open(original_image_file)
+        extracted_json_dict = json.loads(extracted_json)
+        # Get OCR text coordinates
+        text_coordinates = self.get_coordinates(extracted_json_dict)
+        # Reconstruct the table and overlay the edited text
+        self.reconstruct_table(text_coordinates, original_image, text_to_be_removed)
+        # Show the image
+        # original_image.show()
+        # print("Displaying the modified image..")
+        original_image_filename = self.getFileName(original_image_file)
+        augmented_image_filepath = self.image_upload_folder + original_image_filename + '_deleted.png'
+        #Create the deleted image.
+        original_image.save(fp=augmented_image_filepath)
+        return augmented_image_filepath
+
     def removeText(self, text_to_be_removed, extracted_json_list, cropped_image_files):
 
         for index in range(len(extracted_json_list)):
@@ -67,4 +81,6 @@ class Data_Augmentation:
                 white_box = Image.new("RGB", (width, height), color="white")
                 original_image.paste(white_box, (left, top))
 
-# Load the original table image
+    def getFileName(self, input_image):
+        return input_image.replace(self.image_upload_folder, '').replace('.png', '')
+

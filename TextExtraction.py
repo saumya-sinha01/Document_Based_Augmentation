@@ -8,7 +8,7 @@ from ultralyticsplus import YOLO, render_result
 
 class TextExtraction:
 
-    processed_image = None
+    input_image = None
     def __init__(self):
         self.image_upload_folder = 'static\\uploads\\'
         os.environ['USE_TORCH'] = '1'
@@ -16,7 +16,6 @@ class TextExtraction:
         self.extracted_json_list = []
         self.cropped_image_files = []
         self.full_image_json = None
-        self.image_file_name = None
 
         #Initialize and Set Model Parameters...
         self.yolo_model = YOLO('keremberke/yolov8m-table-extraction')
@@ -39,9 +38,12 @@ class TextExtraction:
         return False
 
     def processImage(self, input_image):
-        self.processed_image = input_image
+        self.input_image = input_image
 
+        #Extract json text for the full image..
+        self.full_image_json = self.extractText(input_image)
 
+        #Crop Images to predict the table..
         # perform inference
         results = self.yolo_model.predict(input_image)
 
@@ -51,9 +53,10 @@ class TextExtraction:
         #Extract the filename..
         image_file_name = input_image.replace(self.image_upload_folder, '').replace('.png', '')
 
-        parsed_json_list = []
         result_count = 0
         box_count = 0
+
+        #Extract text from cropped images...
         for result in results:
             result_count += 1
             for captured_box in result.boxes:

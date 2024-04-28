@@ -4,17 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="29842d99-488f-46ac-a5be-c1740b1edd0a" name="Changes" comment="text extraction from the image based on one result.box[]">
-      <change afterPath="$PROJECT_DIR$/Data_Augmentation.py" afterDir="false" />
+    <list default="true" id="29842d99-488f-46ac-a5be-c1740b1edd0a" name="Changes" comment="Fully functional working code.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data_Augmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Data_Augmentation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TextExtraction.py" beforeDir="false" afterPath="$PROJECT_DIR$/TextExtraction.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/editedfrom_Simplefrom.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/editedfrom_Simplefrom_1_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/editedfrom_Simplefrom_MultiText_ReplacedText.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/editedfrom_Simplefrom_MultiText_ReplacedText_1_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/editedfrom_Simplefrom_RemoveText.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/editedfrom_Simplefrom_RemoveText_1_1.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/image_render.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/image_render.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,24 +49,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;Flask server.Document_Based_Augmentation.executor&quot;: &quot;Run&quot;,
-    &quot;Flask server.Flask (app.py) (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Flask server.Flask (app.py).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.TextExtraction.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Flask server.Document_Based_Augmentation.executor": "Run",
+    "Flask server.Flask (app.py) (1).executor": "Debug",
+    "Flask server.Flask (app.py).executor": "Debug",
+    "Python.TextExtraction.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Flask server.Flask (app.py)">
     <configuration name="TextExtraction" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Document_Based_Augmentation" />
@@ -149,6 +143,22 @@
       <option name="launchJavascriptDebuger" value="false" />
       <method v="2" />
     </configuration>
+    <configuration name="Flask (app.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
+      <module name="Document_Based_Augmentation" />
+      <option name="target" value="$PROJECT_DIR$/app.py" />
+      <option name="targetType" value="PATH" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Flask server.Document_Based_Augmentation" />
       <item itemvalue="Flask server.Flask (app.py) (1)" />
@@ -189,7 +199,9 @@
       <workItem from="1713645566697" duration="2000" />
       <workItem from="1713645813890" duration="26135000" />
       <workItem from="1713816531197" duration="44292000" />
-      <workItem from="1714160301747" duration="12636000" />
+      <workItem from="1714160301747" duration="13792000" />
+      <workItem from="1714203512408" duration="7788000" />
+      <workItem from="1714250138369" duration="2295000" />
     </task>
     <task id="LOCAL-00001" summary="committing">
       <option name="closed" value="true" />
@@ -207,7 +219,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713812192244</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Fully functional working code.">
+      <option name="closed" value="true" />
+      <created>1714202351041</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1714202351041</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -217,7 +237,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="committing" />
     <MESSAGE value="text extraction from the image based on one result.box[]" />
-    <option name="LAST_COMMIT_MESSAGE" value="text extraction from the image based on one result.box[]" />
+    <MESSAGE value="Fully functional working code." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fully functional working code." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -228,69 +249,19 @@
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>14</line>
-          <option name="timeStamp" value="84" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>41</line>
-          <option name="timeStamp" value="85" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>25</line>
-          <option name="timeStamp" value="87" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>26</line>
-          <option name="timeStamp" value="88" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>21</line>
-          <option name="timeStamp" value="89" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="90" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>16</line>
-          <option name="timeStamp" value="92" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>58</line>
-          <option name="timeStamp" value="93" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>67</line>
-          <option name="timeStamp" value="94" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>47</line>
-          <option name="timeStamp" value="95" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/TextExtraction.py</url>
           <line>41</line>
           <option name="timeStamp" value="96" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>18</line>
-          <option name="timeStamp" value="97" />
+          <line>19</line>
+          <option name="timeStamp" value="101" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Data_Augmentation.py</url>
-          <line>19</line>
-          <option name="timeStamp" value="98" />
+          <line>18</line>
+          <option name="timeStamp" value="102" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -310,7 +281,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Document_Based_Augmentation$TextExtraction.coverage" NAME="TextExtraction Coverage Results" MODIFIED="1713608393734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Document_Based_Augmentation$Document_Based_Augmentation.coverage" NAME="Document_Based_Augmentation Coverage Results" MODIFIED="1713433774727" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Document_Based_Augmentation$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1714175793140" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Document_Based_Augmentation$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1714250536560" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Document_Based_Augmentation$Flask__app_py___1_.coverage" NAME="Flask (app.py) (1) Coverage Results" MODIFIED="1713815205146" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

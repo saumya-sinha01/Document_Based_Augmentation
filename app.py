@@ -28,7 +28,7 @@ def upload_file():
 @app.route('/searchtext', methods=['POST'])
 def search():
     searchText = request.form['searchText']
-    input_image = textExtraction.processed_image
+    input_image = textExtraction.input_image
 
     if textExtraction.search(searchText):
         return render_template('image_render.html', foundText='Text Found!', img=input_image, searchText=searchText)
@@ -37,25 +37,16 @@ def search():
 
 @app.route('/removeText', methods=['POST'])
 def remove():
-    removeText = request.form['removeText']
-    extracted_json_list = textExtraction.extracted_json_list
-    data_Augmentation.removeText(removeText, extracted_json_list, textExtraction.cropped_image_files)
-    # data_Augmentation.load_JSON(extracted_json_list, removeText)
-    # text_coordinates = data_Augmentation.get_coordinates()
-    # text_to_be_removed = "saumya"
-    #
-    # # Loop through each cropped image file path
-    # for image_file_path in textExtraction.cropped_image_files:
-    #     # Open the image file
-    #     image_file = image_file_path
-    #
-    #     # Call the reconstruct_table method for each image file
-    #     data_Augmentation.reconstruct_table(image_file, text_to_be_removed)
-    # # image_file_path = textExtraction.cropped_image_files
-    # # image_file = Image.open(image_file_path)
-    # # data_Augmentation.reconstruct_table(image_file_path, text_to_be_removed)
+    text_to_be_removed = request.form['removeText']
+    full_json_data = textExtraction.full_image_json
+    full_image_path = textExtraction.input_image
 
+    augmented_image_filepath = data_Augmentation.removeTextFromFullImage(text_to_be_removed, full_json_data, full_image_path)
+    return render_template('image_render.html', deletedText='Deleted All Occurences!',
+                           removedText=text_to_be_removed, img=full_image_path, editedImg=augmented_image_filepath)
 
+    # extracted_json_list = textExtraction.extracted_json_list
+    # data_Augmentation.removeText(removeText, extracted_json_list, textExtraction.cropped_image_files)
 
 
 
