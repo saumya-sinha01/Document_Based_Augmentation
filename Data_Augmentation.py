@@ -24,6 +24,44 @@ class Data_Augmentation:
         original_image.save(fp=augmented_image_filepath)
         return augmented_image_filepath
 
+    #method to replace text based on searched text
+    def replaceText(self, text_to_be_replaced, extracted_json_list, original_image_file, replacement_Text):
+            original_image = Image.open(original_image_file)
+            extracted_json_dict = json.loads(extracted_json_list)
+            # Get OCR text coordinates
+            text_coordinates = self.get_coordinates(extracted_json_dict)
+            # Reconstruct the table and overlay the edited text
+            self.reconstruct_table(text_coordinates, original_image, text_to_be_replaced)
+            # Overlay the edited text (Saumya) on top of the white box with Times New Roman font and blue color
+            font = ImageFont.truetype("timesbd.ttf", size=12)  # Times New Roman font, adjust size as needed
+            self.overlay_text(original_image, replacement_Text, (self.left, self.top), font=font, fill="#000000")  # Black color
+            # Show the image
+            #original_image.show()
+            #print("Displaying the modified image..")
+            original_image_filename = self.getFileName(original_image_file)
+            augemented_image_path_replacement = self.image_upload_folder + original_image_filename + '_replace.png'
+            original_image.save(fp=augemented_image_path_replacement)
+            return augemented_image_path_replacement
+
+    def replaceAllText(self, text_to_be_replaced, extracted_json_list, original_image_file, replacement_Text):
+        original_image = Image.open(original_image_file)
+        extracted_json_dict = json.loads(extracted_json_list)
+        # Get OCR text coordinates
+        text_coordinates = self.get_coordinates(extracted_json_dict)
+        # Reconstruct the table and overlay the edited text
+        coordinates_List = self.reconstruct_table_for_ReplaceAll(text_coordinates, original_image, text_to_be_replaced)
+        # Overlay the edited text (Saumya) on top of the white box with Times New Roman font and blue color
+        font = ImageFont.truetype("timesbd.ttf", size=16)  # Times New Roman font, adjust size as needed
+        # self.overlay_text(original_image, replacement_Text, (self.left, self.top), font=font,fill="#000000")  # Black color
+        self.overlay_text_MutlpleText(original_image, replacement_Text, coordinates_List, font=font, fill="#000000")
+        # Show the image
+        # original_image.show()
+        # print("Displaying the modified image..")
+        original_image_filename = self.getFileName(original_image_file)
+        augemented_image_path_replacement = self.image_upload_folder + original_image_filename + '_replace.png'
+        original_image.save(fp=augemented_image_path_replacement)
+        return augemented_image_path_replacement
+
     def removeText(self, text_to_be_removed, extracted_json_list, cropped_image_files):
 
         for index in range(len(extracted_json_list)):
@@ -45,6 +83,14 @@ class Data_Augmentation:
         if font is None:
             font = ImageFont.load_default()  # Default font
         self.draw.text(position, text, font=font, fill=fill)
+
+    def overlay_text_MutlpleText(self, image, text, coordinates_list, font=None, fill="black"):
+        draw = ImageDraw.Draw(image)
+        if font is None:
+            font = ImageFont.load_default()  # Default font
+        for coord in coordinates_list:
+            position = coord["position"]
+            draw.text(position, text, font=font, fill=fill)
 
     def convert_coordinates(self, geometry, page_dim):
         len_x = page_dim[1]
@@ -72,15 +118,37 @@ class Data_Augmentation:
     def reconstruct_table(self, text_coordinates_dict, original_image, text_to_be_removed):
         for text, coordinates in text_coordinates_dict:
             if str(text).lower() == str(text_to_be_removed).lower():
+
                 # Extract bounding box coordinates
-                left, right, top, bottom = coordinates
+                self.left, self.right, self.top, self.bottom = coordinates
                 # Calculate the width and height of the text box
-                width = right - left
-                height = bottom - top
+                width = self.right - self.left
+                height = self.bottom - self.top
                 # Create a white rectangle to cover the existing text
                 white_box = Image.new("RGB", (width, height), color="white")
-                original_image.paste(white_box, (left, top))
+                original_image.paste(white_box, (self.left, self.top))
 
+    def reconstruct_table_for_ReplaceAll(self, text_coordinates_dict, original_image, text_to_be_removed):
+        # List to store coordinates of the text to be removed and replacement text
+        coordinates_list = []
+        for text, coordinates in text_coordinates_dict:
+            if str(text).lower() == str(text_to_be_removed).lower():
+                # Extract bounding box coordinates
+                self.left, self.right, self.top, self.bottom = coordinates
+                # Calculate the width and height of the text box
+                width = self.right - self.left
+                height = self.bottom - self.top
+                # Create a white rectangle to cover the existing text
+                white_box = Image.new("RGB", (width, height), color="white")
+                original_image.paste(white_box, (self.left, self.top))
+                coordinates_list.append({
+                    "original_text": text,
+                    "original_coordinates": coordinates,
+                    "position": (self.left, self.top)
+                })
+                #self.bottom,self.right
+        print("Coordinates of replaced texts:", coordinates_list)
+        return coordinates_list
     def getFileName(self, input_image):
         return input_image.replace(self.image_upload_folder, '').replace('.png', '')
 

@@ -45,8 +45,25 @@ def remove():
     return render_template('image_render.html', deletedText='Deleted All Occurences!',
                            removedText=text_to_be_removed, img=full_image_path, editedImg=augmented_image_filepath)
 
-    # extracted_json_list = textExtraction.extracted_json_list
-    # data_Augmentation.removeText(removeText, extracted_json_list, textExtraction.cropped_image_files)
+@app.route('/replaceText', methods=['POST'])
+def replace():
+    text_to_be_replaced = request.form['replaceText']
+    full_json_data = textExtraction.full_image_json
+    full_image_path = textExtraction.input_image
+    replacement_text = request.form['replacementText']
+    augemented_image_path_replacement = data_Augmentation.replaceText(text_to_be_replaced, full_json_data, full_image_path, replacement_text)
+    return render_template('image_render.html', replacedText_Msg='Replaced Occurence!', replacementText=replacement_text,
+                           replaceText=text_to_be_replaced, img=full_image_path, editedImg=augemented_image_path_replacement)
 
-
-
+@app.route('/replaceAllText', methods=['POST'])
+def replaceAll():
+    text_to_be_replacedAll = request.form['replaceAllText']
+    full_json_data2= textExtraction.full_image_json
+    full_image_path2 = textExtraction.input_image
+    replacementAll_text = request.form['replacementAllText']
+    augemented_image_path_replacementAll = data_Augmentation.replaceAllText(text_to_be_replacedAll, full_json_data2,
+                                                                      full_image_path2, replacementAll_text)
+    return render_template('image_render.html', replacedAllText_Msg='Replaced all Occurence!',
+                           replacementAllText=replacementAll_text,
+                           replaceAllText=text_to_be_replacedAll, img=full_image_path2,
+                           editedImg=augemented_image_path_replacementAll)

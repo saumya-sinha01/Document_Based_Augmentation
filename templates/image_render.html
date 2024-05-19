@@ -124,31 +124,56 @@
         </form>
 	</tr>
 	<tr>
-        <form action='replace-text' method='GET'>
+        <form action='replaceText' method='POST'>
             <td>Replace:</td>
             <td>
-                <input type="text" id="replace" name="replace" value="Searched/Input Text" style="display: inline-block;">
+                 {% if replaceText %}
+                    <input type="text" id="replaceText" name="replaceText" value="{{ replaceText }}" style="display: inline-block;"  onfocus="this.value='{{ replaceText }}'">
+                {% else %}
+                    <input type="text" id="replaceText" name="replaceText" value="Enter text to be replaced" style="display: inline-block;"  onfocus="this.value=''">
+                {% endif %}
             </td>
             <td>
-                <input type="text" id="replacement" name="replacement" value="Replacement Text" style="display: inline-block;">
+                {% if replacementText %}
+                    <input type="text" id="replacementText" name="replacementText" value="{{ ReplacementText}}" style="display: inline-block;" onfocus="this.value='{{ replacementText }}'">
+                {%  else %}
+                    <input type="text" id="replacementText" name="replacementText" value="Enter text to be replaced with" style="display: inline-block;"  onfocus="this.value=''">
+                {% endif %}
             </td>
             <td>
                 <input type="submit" value="  Replace   ">
             </td>
+                <td>
+                {% if replacedText_Msg %}
+                    <span style="color: #FF0000;">{{ replacedText_Msg }}</span>
+                {% endif %}
+            </td>
         </form>
 	</tr>
 	<tr>
-        <form action='replace-text' method='GET'>
+        <form action='replaceAllText' method='POST'>
             <td>Replace All:</td>
             <td>
-                <input type="text" id="replace-all" name="replace-all" value="Searched/Input Text" style="display: inline-block;">
+                 {% if replaceAllText %}
+                    <input type="text" id="replaceAllText" name="replaceAllText" value="{{ replaceAllText }}" style="display: inline-block;"  onfocus="this.value='{{ replaceAllText }}'">
+                {% else %}
+                    <input type="text" id="replaceAllText" name="replaceAllText" value="Enter text to be replaced" style="display: inline-block;"  onfocus="this.value=''">
+                {% endif %}
             </td>
             <td>
-                <input type="text" id="replacement-all" name="replacement-all" value="Replacement Text" style="display: inline-block;">
+                {% if replacementAllText %}
+                    <input type="text" id="replacementAllText" name="replacementAllText" value="{{ replacementAllText}}" style="display: inline-block;" onfocus="this.value='{{ replacementAllText }}'">
+                {%  else %}
+                    <input type="text" id="replacementAllText" name="replacementAllText" value="Enter text to be replaced with" style="display: inline-block;"  onfocus="this.value=''">
+                {% endif %}
             </td>
-            <td>
-                <input type="submit" value="Replace All">
-
+             <td>
+                <input type="submit" value="  ReplaceAll   ">
+            </td>
+                <td>
+                {% if replacedText_Msg %}
+                    <span style="color: #FF0000;">{{ replacedAllText_Msg }}</span>
+                {% endif %}
             </td>
         </form>
 	</tr>
