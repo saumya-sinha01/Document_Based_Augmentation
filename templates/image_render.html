@@ -85,6 +85,48 @@
 <br>
 
 <table>
+<tr>
+    <form action='/displayKeyValuePairs' method='POST'>
+        <td>Show Key-Value Pairs:</td>
+        <td>
+            <input type="submit" value="Show KVPs">
+        </td>
+    </form>
+</tr>
+
+<tr>
+    {% if kv_tuples %}
+        <h2>Detected Key-Value Pairs</h2>
+        <ul>
+            {% for tuple in kv_tuples %}
+                <li><strong>{{ tuple['label'] }}:</strong> {{ tuple['value'] }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</tr>
+
+{#<tr>#}
+{#        <form action='/KVPSearch' method='POST'>#}
+{#            <td>Show Key-Value Pairs:</td>#}
+{#            <td>#}
+{#                <input type="submit" value="Show KVPs">#}
+{#            </td>#}
+{##}
+{##}
+{#            <td>#}
+{#                {% if key_value_pairs %}#}
+{#                <h2>Detected Key-Value Pairs</h2>#}
+{#                <ul>#}
+{#                    {% for key, value in key_value_pairs %}#}
+{#                        <li><strong>{{ key }}:</strong> {{ value }}</li>#}
+{#                    {% endfor %}#}
+{#                </ul>#}
+{#                {% endif %}#}
+{##}
+{#            </td>#}
+{#          </form>#}
+{#    </tr>#}
+
 	<tr>
         <form action='/searchtext' method='POST'>
             <td>Search:</td>
@@ -177,6 +219,24 @@
             </td>
         </form>
 	</tr>
+
+{#    <tr>#}
+{##}
+{#    <h2>Key-Value Pairs</h2>#}
+{#    {% if key_value_pairs %}#}
+{#        <ul>#}
+{#            {% for key, value in key_value_pairs %}#}
+{#                <li>{{ key }}: {{ value }}</li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    {% else %}#}
+{#        <p>No key-value pairs found.</p>#}
+{#    {% endif %}#}
+{##}
+{#    <form action="/extract_kv_pairs" method="post">#}
+{#        <button type="submit">Extract Key-Value Pairs</button>#}
+{#    </form>#}
+{#    </tr>#}
 </table>
 </body>
 </html>

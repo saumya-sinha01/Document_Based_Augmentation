@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
-import os
+import os, re
 
 from TextExtraction import TextExtraction
 from Data_Augmentation import Data_Augmentation
@@ -24,6 +24,12 @@ def upload_file():
         return render_template('image_render.html', img=input_image)
 
     return render_template('image_render.html')
+
+@app.route('/displayKeyValuePairs', methods=['POST'])
+def displayKeyValuePairs():
+    input_image = textExtraction.input_image
+    extracted_kv_pairs = textExtraction.extracted_key_value_pairs[0][0]
+    return render_template('image_render.html', img=input_image, kv_tuples=extracted_kv_pairs)
 
 @app.route('/searchtext', methods=['POST'])
 def search():
@@ -67,3 +73,22 @@ def replaceAll():
                            replacementAllText=replacementAll_text,
                            replaceAllText=text_to_be_replacedAll, img=full_image_path2,
                            editedImg=augemented_image_path_replacementAll)
+
+
+#
+# @app.route('/KVPSearch', methods=['POST'])
+# def KVPSearch():
+#     key_value_pairs = textExtraction.extract_key_value_pairs()
+#     return render_template('image_render.html', key_value_pairs=key_value_pairs, img=textExtraction.input_image)
+
+@app.route('/KVPSearch', methods=['POST'])
+def kvp_search():
+    key_value_pairs = textExtraction.display_key_value_pairs()
+    return render_template('image_render.html', key_value_pairs=key_value_pairs, img=textExtraction.input_image)
+
+
+# def extract_key_value_pairs(text):
+#     # Define a regular expression pattern to match key-value pairs
+#     pattern = re.compile(r'(\w+):\s*(\w+\s*\w*)')
+#     key_value_pairs = pattern.findall(text)
+#     return key_value_pairs
