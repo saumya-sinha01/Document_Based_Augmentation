@@ -88,14 +88,15 @@ class KeyValuePairExtractor:
 
         return key_pairs, bboxes
 
-
     def visualize_image(self, image, key_pairs, bboxes):
         draw = ImageDraw.Draw(image)
         font = ImageFont.load_default()
         label2color = {'KEY': 'blue', 'VALUE': 'green', 'TITLE': 'orange'}
 
-        for kp, box in enumerate(zip(key_pairs, bboxes)):
-            draw.rectangle(box, outline=label2color[kp['label']])
+        for i, (kp, box) in enumerate(zip(key_pairs, bboxes)):
+            coord = [(box[0], box[1]), (box[2], box[3])]
+            predicted_label = kp['label']
+            draw.rectangle(coord, outline=label2color[predicted_label])
             draw.text((box[0] + 10, box[1] - 10), text=kp['label'], fill=label2color[predicted_label], font=font)
 
         return image
@@ -110,9 +111,11 @@ class KeyValuePairExtractor:
         feature_extractor, processor, model = self.load_models()
 
         # gets the bounding boxes, predictions, extracted words and image processed
-        kp = self.process_image(image, feature_extractor, processor, model, labels)
+        kp, bboxes = self.process_image(image, feature_extractor, processor, model, labels)
 
-        return kp
+        labeled_image = self.visualize_image(image, kp, bboxes)
+
+        return kp, labeled_image
 
 
 # kvExtractor = KeyValuePairExtractor()

@@ -33,7 +33,7 @@ class Data_Augmentation:
             # Reconstruct the table and overlay the edited text
             self.reconstruct_table(text_coordinates, original_image, text_to_be_replaced)
             # Overlay the edited text (Saumya) on top of the white box with Times New Roman font and blue color
-            font = ImageFont.truetype("timesbd.ttf", size=12)  # Times New Roman font, adjust size as needed
+            font = ImageFont.truetype("times.ttf", size=14)  # Times New Roman font, adjust size as needed
             self.overlay_text(original_image, replacement_Text, (self.left, self.top), font=font, fill="#000000")  # Black color
             # Show the image
             #original_image.show()
@@ -51,7 +51,7 @@ class Data_Augmentation:
         # Reconstruct the table and overlay the edited text
         coordinates_List = self.reconstruct_table_for_ReplaceAll(text_coordinates, original_image, text_to_be_replaced)
         # Overlay the edited text (Saumya) on top of the white box with Times New Roman font and blue color
-        font = ImageFont.truetype("timesbd.ttf", size=16)  # Times New Roman font, adjust size as needed
+        font = ImageFont.truetype("times.ttf", size=16)  # Times New Roman font, adjust size as needed
         # self.overlay_text(original_image, replacement_Text, (self.left, self.top), font=font,fill="#000000")  # Black color
         self.overlay_text_MutlpleText(original_image, replacement_Text, coordinates_List, font=font, fill="#000000")
         # Show the image

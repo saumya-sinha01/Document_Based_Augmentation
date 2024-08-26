@@ -2,241 +2,299 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Rendering Dynamic Images Using Flask</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Based Text Generation And Detection</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Custom CSS for the sticky navigation bar */
+        .sticky-top {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            background-color: #e9f0fa; /* Pastel blue */
+            padding: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sticky-top h2 {
+            color: #495057;
+            text-align: center; /* Center the heading text */
             margin: 0;
-            padding: 0;
+            font-weight: bold; /* Make the text bold */
         }
 
-        img {
-            width: 90%;
+        /* Sidebar styling */
+        .sidebar {
+            height: 100vh;
+            padding-top: 20px;
+            background-color: #e8f0fe; /* Pastel blue */
         }
 
-        .container {
-            text-align: center;
+        .sidebar a {
+            color: #495057;
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #d1d9de;
+            color: #495057;
+        }
+
+        .sidebar a.active {
+            background-color: #cfe2f3; /* Light pastel blue */
+            color: #495057;
+        }
+
+        /* Main content styling */
+        .content {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
         }
 
-        .header {
-            display: inline;
+        .content h3 {
+            color: #495057;
         }
 
-        .text-input {
-            display: inline-block;
-            margin: 0 10px;
-            padding: 5px;
-            border: 1px solid #ccc;
+        .content p {
+            color: #6c757d;
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: #a3d2ca; /* Pastel green */
+            border-color: #a3d2ca;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #8ab3b0; /* Slightly darker pastel green */
+            border-color: #8ab3b0;
+        }
+
+        /* File input styling */
+        .form-control {
+            border: 2px solid #a3d2ca;
             border-radius: 5px;
+            transition: border-color 0.3s;
         }
 
-        .button {
-            padding: 8px 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        .form-control:focus {
+            border-color: #8ab3b0;
+            box-shadow: none;
         }
 
-        .button:hover {
-            background-color: #0056b3;
+        /* Image preview styling */
+        .img-preview {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #f6c6ea; /* Pastel pink */
+            border-radius: 10px;
+            display: block;
         }
 
-        .row {
-		  display: flex;
-		}
+        /* Multi-column layout */
+        .multi-column-list {
+            column-count: 3; /* Number of columns */
+            column-gap: 20px; /* Space between columns */
+            list-style-type: none; /* Remove default bullet points */
+            padding: 0; /* Remove default padding */
+            margin: 0; /* Remove default margin */
+        }
 
-        .column1:not(:last-child) {
-		  border-right: 3px solid #ccc; /* Add border to all columns except the last one */
-		  padding-right: 20px; /* Adjust spacing as needed */
-          width: 50%;
-		}
+        /* Alternating colors for each li */
+        .multi-column-list li:nth-child(odd) {
+            background-color: #f2f2f2; /* Light gray for odd items */
+        }
+
+        .multi-column-list li:nth-child(even) {
+            background-color: #e9e9e9; /* Slightly darker gray for even items */
+        }
+
+        /* Style the li elements */
+        .multi-column-list li {
+            padding: 5px 10px; /* Padding inside each list item */
+            margin-bottom: 5px; /* Space between items */
+            border-radius: 5px; /* Rounded corners */
+        }
+
+        .searchDiv {
+            width: 50%;
+            border: 1px outset black;
+            background-color: #f2f2f2;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-<div class = "row">
-    <form action="{{ url_for('upload_file') }}" enctype="multipart/form-data" method="POST">
-            <input name="img" type="file"/>
-            <input type="submit" value="Upload"/>
-    </form>
-</div>
-<div class="row">
-    <div class="column1">
-        {% if img %}
-            <h1>Rendered Image</h1>
-            <img src="{{img}}">
-        {% else %}
-            <h1>Image will render here...</h1>
-        {% endif %}
+    <!-- Sticky Navigation Bar -->
+    <nav class="sticky-top">
+        <div class="container-fluid">
+            <h2>Document Based Text Generation And Detection</h2>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Section -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <a href="#" id="uploadLink" class="active" onclick="showSection('uploadSection')">Upload Document</a>
+                <a href="#" id="kvpLink" onclick="showSection('kvpSection')">Key Value Pair</a> <!-- Added Button -->
+                <a href="#" id="searchLink" onclick="showSection('searchSection')">Search Text</a>
+                <a href="#" id="replaceLink" onclick="showSection('replaceSection')">Replace Text</a>
+                <a href="#" id="deleteLink" onclick="showSection('deleteSection')">Delete Text</a>
+            </div>
+
+            <!-- Main Content Section -->
+            <div class="col-md-9 col-lg-10 content">
+                <!-- Upload Document Section -->
+                <div id="uploadSection">
+                    <h3>Upload Document</h3>
+                    <form id="uploadForm" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" method="POST">
+                        <div class="mb-3">
+                            <input name="img" type="file" class="form-control" id="fileInput" aria-label="Choose File" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                    <!-- Image Preview -->
+                    {% if img %}
+                        <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
+                    {% endif %}
+                </div>
+
+                <!-- Key Value Pair Section -->
+                <div id="kvpSection" style="margin-top: 20px;">
+                    <h3>Key Value Pairs</h3>
+                    <form action="{{ url_for('displayKeyValuePairs') }}" method="POST">
+                        <button class="btn btn-primary" type="submit">Show Key-Value Pairs</button>
+                    </form>
+                    {% if labeled_images %}
+                         {% for image in labeled_images %}
+                             <div>
+                                <img id="imgPreview" class="img-preview" src="{{image}}" alt="Labeled Image">
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if kv_tuples %}
+                        <br/>
+                        <ul class="multi-column-list">
+                            {% for tuple in kv_tuples %}
+                                <li><strong>{{ tuple['label'] }}:</strong> {{ tuple['value'] }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Other Sections (Search, Replace, Delete) -->
+                <div id="searchSection" style="display: none;">
+                    <h3>Search Text</h3>
+                    <form action="{{ url_for('search') }}" method="POST">
+                        <input type="hidden" name="currentSection" value="searchSection">
+                        <div class="input-group mb-3">
+{#                            <input type="text" class="form-control" id="searchText" name="searchText" value="Enter Search Term" onfocus="this.value=''">#}
+                            <input type="text" class="form-control" id="searchText" name="searchText" value="{{ searchText if searchText else 'Enter Search Term' }}"
+                                    onfocus="if(this.value=='Enter Search Term') this.value=''">
+                        </div>
+                        <button class="btn btn-primary" type="submit">Search</button>
+                        {% if foundText %}
+                            <br/>
+                            <div class="d-flex justify-content-center">
+                                <div class="searchDiv"> {{ foundText }} </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Image Preview -->
+                        {% if img %}
+                            <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
+                        {% endif %}
+
+                    </form>
+                </div>
+
+                <div id="replaceSection" style="display: none;">
+                    <h3>Replace Text</h3>
+                    <form action="replaceText" method="POST">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="replaceText" name="replaceText" value="Enter text to be replaced" onfocus="this.value='{{ replaceText }}'">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="replacementText" name="replacementText" value="Enter text to replace with" onfocus="this.value='{{ replacementText }}'">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Replace</button>
+                        {% if replacedText_Msg %}
+                            <p style="color: #FF0000;">{{ replacedText_Msg }}</p>
+                        {% endif %}
+
+                        <!-- Image Preview -->
+                        {% if img %}
+                            <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
+                        {% endif %}
+                    </form>
+                </div>
+
+                <div id="deleteSection" style="display: none;">
+                    <h3>Delete Text</h3>
+                    <form action="removeText" method="POST">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="removeText" name="removeText" value="Enter text to be removed" onfocus="this.value='{{ removedText }}'">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Remove</button>
+                        {% if deletedText %}
+                            <p style="color: #FF0000;">{{ deletedText }}</p>
+                        {% endif %}
+
+                        <!-- Image Preview -->
+                        {% if img %}
+                            <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="column1" >
-	    {% if editedImg %}
-            <h1>Edited Image</h1>
-            <img src="{{editedImg}}">
-        {% else %}
-            <h1>Edited Image will render here...</h1>
-        {% endif %}
-    </div>
-</div>
 
-<br>
+   <script>
+    // Function to show only the relevant section
+    function showSection(sectionId) {
+        // Hide all sections
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('kvpSection').style.display = 'none';
+        document.getElementById('searchSection').style.display = 'none';
+        document.getElementById('replaceSection').style.display = 'none';
+        document.getElementById('deleteSection').style.display = 'none';
 
-<table>
-<tr>
-    <form action='/displayKeyValuePairs' method='POST'>
-        <td>Show Key-Value Pairs:</td>
-        <td>
-            <input type="submit" value="Show KVPs">
-        </td>
-    </form>
-</tr>
+        // Show the selected section
+        document.getElementById(sectionId).style.display = 'block';
 
-<tr>
-    {% if kv_tuples %}
-        <h2>Detected Key-Value Pairs</h2>
-        <ul>
-            {% for tuple in kv_tuples %}
-                <li><strong>{{ tuple['label'] }}:</strong> {{ tuple['value'] }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-</tr>
+         // Remove the active class from all links
+        const links = document.querySelectorAll('.sidebar a');
+        links.forEach(link => link.classList.remove('active'));
 
-{#<tr>#}
-{#        <form action='/KVPSearch' method='POST'>#}
-{#            <td>Show Key-Value Pairs:</td>#}
-{#            <td>#}
-{#                <input type="submit" value="Show KVPs">#}
-{#            </td>#}
-{##}
-{##}
-{#            <td>#}
-{#                {% if key_value_pairs %}#}
-{#                <h2>Detected Key-Value Pairs</h2>#}
-{#                <ul>#}
-{#                    {% for key, value in key_value_pairs %}#}
-{#                        <li><strong>{{ key }}:</strong> {{ value }}</li>#}
-{#                    {% endfor %}#}
-{#                </ul>#}
-{#                {% endif %}#}
-{##}
-{#            </td>#}
-{#          </form>#}
-{#    </tr>#}
+        // Add the active class to the clicked link
+        const clickedLink = document.querySelector(`a[onclick="showSection('${sectionId}')"]`);
+        if (clickedLink) {
+            clickedLink.classList.add('active');
+        }
+    }
 
-	<tr>
-        <form action='/searchtext' method='POST'>
-            <td>Search:</td>
-            <td>
-                <input type="text" id="searchText" name="searchText" value="Enter Search Term"
-                       style="display: inline-block;" onfocus="this.value='{{ searchText }}'" >
-            </td>
-            <td>
-                <input type="submit" value=" Search ">
-            </td>
-            <td>
-                {% if foundText %}
-                    <span style="color: #FF0000;">{{ foundText }}</span>
-                {% endif %}
-            </td>
-        </form>
-        </form>
-	</tr>
-	<tr>
-        <form action='/removeText' method='POST'>
-            <td>Remove:</td>
-            <td>
-                {% if removedText %}
-                    <input type="text" id="removeText" name="removeText" value="{{ removedText }}" style="display: inline-block;"  onfocus="this.value='{{ removedText }}'">
-                {% else %}
-                    <input type="text" id="removeText" name="removeText" value="Enter text to be removed" style="display: inline-block;"  onfocus="this.value=''">
-                {% endif %}
-            </td>
-            <td>
-                <input type="submit" value="Remove">
-            </td>
-            <td>
-                {% if deletedText %}
-                    <span style="color: #FF0000;">{{ deletedText }}</span>
-                {% endif %}
-            </td>
-        </form>
-	</tr>
-	<tr>
-        <form action='replaceText' method='POST'>
-            <td>Replace:</td>
-            <td>
-                 {% if replaceText %}
-                    <input type="text" id="replaceText" name="replaceText" value="{{ replaceText }}" style="display: inline-block;"  onfocus="this.value='{{ replaceText }}'">
-                {% else %}
-                    <input type="text" id="replaceText" name="replaceText" value="Enter text to be replaced" style="display: inline-block;"  onfocus="this.value=''">
-                {% endif %}
-            </td>
-            <td>
-                {% if replacementText %}
-                    <input type="text" id="replacementText" name="replacementText" value="{{ ReplacementText}}" style="display: inline-block;" onfocus="this.value='{{ replacementText }}'">
-                {%  else %}
-                    <input type="text" id="replacementText" name="replacementText" value="Enter text to be replaced with" style="display: inline-block;"  onfocus="this.value=''">
-                {% endif %}
-            </td>
-            <td>
-                <input type="submit" value="  Replace   ">
-            </td>
-                <td>
-                {% if replacedText_Msg %}
-                    <span style="color: #FF0000;">{{ replacedText_Msg }}</span>
-                {% endif %}
-            </td>
-        </form>
-	</tr>
-	<tr>
-        <form action='replaceAllText' method='POST'>
-            <td>Replace All:</td>
-            <td>
-                 {% if replaceAllText %}
-                    <input type="text" id="replaceAllText" name="replaceAllText" value="{{ replaceAllText }}" style="display: inline-block;"  onfocus="this.value='{{ replaceAllText }}'">
-                {% else %}
-                    <input type="text" id="replaceAllText" name="replaceAllText" value="Enter text to be replaced" style="display: inline-block;"  onfocus="this.value=''">
-                {% endif %}
-            </td>
-            <td>
-                {% if replacementAllText %}
-                    <input type="text" id="replacementAllText" name="replacementAllText" value="{{ replacementAllText}}" style="display: inline-block;" onfocus="this.value='{{ replacementAllText }}'">
-                {%  else %}
-                    <input type="text" id="replacementAllText" name="replacementAllText" value="Enter text to be replaced with" style="display: inline-block;"  onfocus="this.value=''">
-                {% endif %}
-            </td>
-             <td>
-                <input type="submit" value="  ReplaceAll   ">
-            </td>
-                <td>
-                {% if replacedText_Msg %}
-                    <span style="color: #FF0000;">{{ replacedAllText_Msg }}</span>
-                {% endif %}
-            </td>
-        </form>
-	</tr>
+    // Call showSection with the current section when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentSection = "{{ currentSection | default('uploadSection') }}";
+        showSection(currentSection);
+    });
+</script>
 
-{#    <tr>#}
-{##}
-{#    <h2>Key-Value Pairs</h2>#}
-{#    {% if key_value_pairs %}#}
-{#        <ul>#}
-{#            {% for key, value in key_value_pairs %}#}
-{#                <li>{{ key }}: {{ value }}</li>#}
-{#            {% endfor %}#}
-{#        </ul>#}
-{#    {% else %}#}
-{#        <p>No key-value pairs found.</p>#}
-{#    {% endif %}#}
-{##}
-{#    <form action="/extract_kv_pairs" method="post">#}
-{#        <button type="submit">Extract Key-Value Pairs</button>#}
-{#    </form>#}
-{#    </tr>#}
-</table>
+
 </body>
 </html>

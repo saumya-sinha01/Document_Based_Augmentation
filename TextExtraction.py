@@ -4,6 +4,7 @@ import pytesseract
 from doctr.io import DocumentFile
 from doctr.models import ocr_predictor
 from ultralyticsplus import YOLO, render_result
+from PIL import Image, ImageDraw, ImageFont
 
 from KeyValuePairExtractor import KeyValuePairExtractor
 
@@ -17,6 +18,7 @@ class TextExtraction:
 
         self.extracted_json_list = []
         self.extracted_key_value_pairs = []
+        self.labeled_images = []
         self.cropped_image_files = []
         self.full_image_json = None
 
@@ -31,18 +33,15 @@ class TextExtraction:
         self.predictor = ocr_predictor(pretrained=True)
         self.kvExtractor = KeyValuePairExtractor()
 
-    def search(self, searchText):
-        if not searchText:
-            return False
-
-        searchText = searchText.lower()
-        if searchText in self.dict:
-            return True
-
-        return False
-
     def processImage(self, input_image):
         self.input_image = input_image
+
+        #Reset State:
+        self.extracted_json_list = []
+        self.extracted_key_value_pairs = []
+        self.labeled_images = []
+        self.cropped_image_files = []
+        self.full_image_json = None
 
         #Extract json text for the full image..
         self.full_image_json = self.extractText(input_image)
@@ -56,6 +55,11 @@ class TextExtraction:
 
         #Extract the filename..
         image_file_name = input_image.replace(self.image_upload_folder, '').replace('.png', '')
+        image_file_name = image_file_name.replace(self.image_upload_folder, '').replace('.jpg', '')
+        image_file_name = image_file_name.replace(self.image_upload_folder, '').replace('.jpeg', '')
+
+        #Get the original width and height.
+        orig_width, orig_height, channels = original_image.shape
 
         result_count = 0
         box_count = 0
@@ -78,16 +82,38 @@ class TextExtraction:
                 # Save or display the cropped image
                 cropped_image_filename = self.image_upload_folder + image_file_name + '_' + str(result_count) + '_' + str(box_count) + '.png'
                 cv2.imwrite(cropped_image_filename, cropped_image)
-                render_result(model=self.yolo_model, image=cropped_image, result=result).show()
+                # render_result(model=self.yolo_model, image=cropped_image, result=result).show()
 
                 #Extract the key value pairs for cropped image...
-                extractedKVPairs = self.kvExtractor.extract_key_value_pair(cropped_image_filename)
+                extractedKVPairs, labeled_image = self.kvExtractor.extract_key_value_pair(cropped_image_filename)
                 self.extracted_key_value_pairs.append(extractedKVPairs)
+
+                labeled_image_filename = self.image_upload_folder + image_file_name + '_' + str(result_count) + '_' + str(box_count) + '_labeled.png'
+                #Resize the image.
+                resized_image = labeled_image.resize((orig_height, orig_width))
+                resized_image.save(labeled_image_filename)
+                self.labeled_images.append(labeled_image_filename)
 
                 extracted_json = self.extractText(cropped_image_filename)
                 self.extracted_json_list.append(extracted_json)
                 self.cropped_image_files.append(cropped_image_filename)
                 self.parse_extracted_json(extracted_json)
+
+
+    def search(self, searchText):
+        if not searchText:
+            return False
+
+        lowercaseSearchText = searchText.lower()
+        if lowercaseSearchText in self.dict:
+            # valueMap = self.dict[lowercaseSearchText][0]
+            # geometry = valueMap['geometry']
+            # coordinates = [geometry[0][0], geometry[0][1], geometry[1][0], geometry[1][1]]
+            # searched_image = self.visualize_image(self.input_image, searchText, coordinates)
+            # searchedImage = visualize_ima
+            return True
+
+        return False
 
     def parse_extracted_json(self, extracted_json):
         self.dict = defaultdict()
@@ -156,18 +182,6 @@ class TextExtraction:
             for key, value in data.items():
                 self.remove_geometry(value)
 
-    # def extract_key_value_pairs(self):
-    #     key_value_pairs = []
-    #     for json_data in self.extracted_json_list:
-    #         data = json.loads(json_data)
-    #         for page in data['pages']:
-    #             for block in page['blocks']:
-    #                 for line in block['lines']:
-    #                     text = ' '.join(word['value'] for word in line['words'])
-    #                     pairs = re.findall(r'(\w+):\s*(\w+)', text)
-    #                     key_value_pairs.extend(pairs)
-    #     return key_value_pairs
-
     def extract_key_value_pairs(self, text):
         lines = text.split('\n')
         kvp = {}
@@ -191,25 +205,13 @@ class TextExtraction:
         kvp = self.extract_key_value_pairs(text)
         return kvp
 
-    # def extract_key_value_pairs(self):
-    #     key_value_pairs = []
-    #     for extracted_json in self.extracted_json_list:
-    #         dict = json.loads(extracted_json)
-    #         value_dict = dict['pages'][0]
-    #         block_list = value_dict['blocks']
-    #         for block_value in block_list:
-    #             line_list = block_value['lines']
-    #             for line in line_list:
-    #                 text = ' '.join([word['value'] for word in line['words']])
-    #                 pairs = self._find_key_value_pairs(text)
-    #                 key_value_pairs.extend(pairs)
-    #     return key_value_pairs
-    #
-    # def _find_key_value_pairs(self, text):
-    #     pattern = re.compile(r'(\w+):\s*(\w+)')
-    #     key_value_pairs = pattern.findall(text)
-    #     return key_value_pairs
-
+    def visualize_image(self, image, text, coordinates):
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.load_default()
+        coord = [(coordinates[0], coordinates[1]), (coordinates[2], coordinates[3])]
+        draw.rectangle(coord, outline='red')
+        draw.text((coordinates[0] + 10, coordinates[1] - 10), text=text, fill='red', font=font)
+        return image
 
 
 
