@@ -101,7 +101,7 @@ class KeyValuePairExtractor:
 
         return image
 
-    def extract_key_value_pair(self, input_path_image):
+    def extract_key_value_pair_from_image_path(self, input_path_image):
         # loads the pretrained dataset also
         # loads the image and labels
         image = self.load_image(input_path_image)
@@ -115,11 +115,12 @@ class KeyValuePairExtractor:
 
         labeled_image = self.visualize_image(image, kp, bboxes)
 
-        return kp, labeled_image
-
+        return kp, bboxes, labeled_image
 
 # kvExtractor = KeyValuePairExtractor()
-# input_path_image = 'D:/DocumentGen/test_images/test_image_1.jpg'
+# input_path_image = 'D:\\PycharmProjects\\Document_Based_Augmentation\\Document_Based_Augmentation\\static\\uploads\\test_image_4.jpg'
+# kp, bboxes, labeled_image = kvExtractor.extract_key_value_pair_from_image_path(input_path_image)
+# labeled_image.show()
 # kp = kvExtractor.extract_key_value_pair(input_path_image)
 # # print(kp)
 # tuples_list = kp[0]

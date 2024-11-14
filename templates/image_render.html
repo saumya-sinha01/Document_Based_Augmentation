@@ -134,137 +134,227 @@
             background-color: #f2f2f2;
             text-align: center;
         }
+
+        .replaceTextDiv {
+            width: 50%;
+            border: 1px outset black;
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+
+        .deleteTextDiv {
+            width: 50%;
+            border: 1px outset black;
+            background-color: #f2f2f2;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <!-- Sticky Navigation Bar -->
-    <nav class="sticky-top">
-        <div class="container-fluid">
-            <h2>Document Based Text Generation And Detection</h2>
-        </div>
-    </nav>
-
+<!-- Sticky Navigation Bar -->
+<nav class="sticky-top">
     <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar Section -->
-            <div class="col-md-3 col-lg-2 sidebar">
-                <a href="#" id="uploadLink" class="active" onclick="showSection('uploadSection')">Upload Document</a>
-                <a href="#" id="kvpLink" onclick="showSection('kvpSection')">Key Value Pair</a> <!-- Added Button -->
-                <a href="#" id="searchLink" onclick="showSection('searchSection')">Search Text</a>
-                <a href="#" id="replaceLink" onclick="showSection('replaceSection')">Replace Text</a>
-                <a href="#" id="deleteLink" onclick="showSection('deleteSection')">Delete Text</a>
+        <h2>Document Based Text Generation And Detection</h2>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Section -->
+        <div class="col-md-3 col-lg-2 sidebar">
+            <a href="#" id="uploadLink" class="active" onclick="showSection('uploadSection')">Upload Document</a>
+            <a href="#" id="kvpLink" onclick="showSection('kvpSection')">Key Value Pair</a> <!-- Added Button -->
+            <a href="#" id="searchLink" onclick="showSection('searchSection')">Search Text</a>
+            <a href="#" id="replaceLink" onclick="showSection('replaceSection')">Replace Text</a>
+            <a href="#" id="deleteLink" onclick="showSection('deleteSection')">Delete Text</a>
+        </div>
+
+        <!-- Main Content Section -->
+        <div class="col-md-9 col-lg-10 content">
+            <!-- Upload Document Section -->
+            <div id="uploadSection">
+                <h3>Upload Document</h3>
+                <form id="uploadForm" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" method="POST">
+                    <div class="mb-3">
+                        <input name="img" type="file" class="form-control" id="fileInput" aria-label="Choose File"
+                               accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+                <!-- Image Preview -->
+                {% if img %}
+                    <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
+                {% endif %}
             </div>
 
-            <!-- Main Content Section -->
-            <div class="col-md-9 col-lg-10 content">
-                <!-- Upload Document Section -->
-                <div id="uploadSection">
-                    <h3>Upload Document</h3>
-                    <form id="uploadForm" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" method="POST">
-                        <div class="mb-3">
-                            <input name="img" type="file" class="form-control" id="fileInput" aria-label="Choose File" accept="image/*">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Upload</button>
-                    </form>
-                    <!-- Image Preview -->
-                    {% if img %}
-                        <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
-                    {% endif %}
-                </div>
-
-                <!-- Key Value Pair Section -->
-                <div id="kvpSection" style="margin-top: 20px;">
-                    <h3>Key Value Pairs</h3>
-                    <form action="{{ url_for('displayKeyValuePairs') }}" method="POST">
-                        <button class="btn btn-primary" type="submit">Show Key-Value Pairs</button>
-                    </form>
-                    {% if labeled_images %}
-                         {% for image in labeled_images %}
-                             <div>
-                                <img id="imgPreview" class="img-preview" src="{{image}}" alt="Labeled Image">
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    {% if kv_tuples %}
-                        <br/>
-                        <ul class="multi-column-list">
-                            {% for tuple in kv_tuples %}
-                                <li><strong>{{ tuple['label'] }}:</strong> {{ tuple['value'] }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-
-                <!-- Other Sections (Search, Replace, Delete) -->
-                <div id="searchSection" style="display: none;">
-                    <h3>Search Text</h3>
-                    <form action="{{ url_for('search') }}" method="POST">
-                        <input type="hidden" name="currentSection" value="searchSection">
-                        <div class="input-group mb-3">
-{#                            <input type="text" class="form-control" id="searchText" name="searchText" value="Enter Search Term" onfocus="this.value=''">#}
-                            <input type="text" class="form-control" id="searchText" name="searchText" value="{{ searchText if searchText else 'Enter Search Term' }}"
-                                    onfocus="if(this.value=='Enter Search Term') this.value=''">
-                        </div>
-                        <button class="btn btn-primary" type="submit">Search</button>
-                        {% if foundText %}
+            <!-- Key Value Pair Section -->
+            <div id="kvpSection" style="margin-top: 20px;">
+                <h3>Key Value Pairs</h3>
+                <form action="{{ url_for('displayKeyValuePairs') }}" method="POST">
+                    <button class="btn btn-primary" type="submit">Show Key-Value Pairs</button>
+                </form>
+                {% if labeled_images %}
+                    {% for image in labeled_images %}
+                        <div class="container">
                             <br/>
-                            <div class="d-flex justify-content-center">
-                                <div class="searchDiv"> {{ foundText }} </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div>
+                                        <h4>Original Image</h4>
+                                        <hr/>
+                                        <img id="imgPreview" class="img-preview" src="{{ img }}"
+                                             alt="Original Image">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div>
+                                        <h4>Rendered Image</h4>
+                                        <hr/>
+                                        <img id="imgPreview" class="img-preview" src="{{ image }}" alt="Labeled Image">
+                                    </div>
+                                </div>
                             </div>
-                        {% endif %}
-
-                        <!-- Image Preview -->
-                        {% if img %}
-                            <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
-                        {% endif %}
-
-                    </form>
-                </div>
-
-                <div id="replaceSection" style="display: none;">
-                    <h3>Replace Text</h3>
-                    <form action="replaceText" method="POST">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="replaceText" name="replaceText" value="Enter text to be replaced" onfocus="this.value='{{ replaceText }}'">
                         </div>
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="replacementText" name="replacementText" value="Enter text to replace with" onfocus="this.value='{{ replacementText }}'">
+                    {% endfor %}
+                {% endif %}
+
+                {% if kv_tuples %}
+                    <br/>
+                    <h4>Extracted Key Value Pairs</h4>
+                    <hr/>
+                    <ul class="multi-column-list">
+                        {% for tuple in kv_tuples %}
+                            <li><strong>{{ tuple['label'] }}:</strong> {{ tuple['value'] }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- Other Sections (Search, Replace, Delete) -->
+            <div id="searchSection" style="display: none;">
+                <h3>Search Text</h3>
+                <form action="{{ url_for('search') }}" method="POST">
+                    <input type="hidden" name="currentSection" value="searchSection">
+                    <div class="input-group mb-3">
+                        {#                            <input type="text" class="form-control" id="searchText" name="searchText" value="Enter Search Term" onfocus="this.value=''">#}
+                        <input type="text" class="form-control" id="searchText" name="searchText"
+                               value="{{ searchText if searchText else 'Enter Search Term' }}"
+                               onfocus="if(this.value=='Enter Search Term') this.value=''">
+                    </div>
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    {% if foundText %}
+                        <br/>
+                        <div class="d-flex justify-content-center">
+                            <div class="searchDiv"> {{ foundText }} </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Replace</button>
-                        {% if replacedText_Msg %}
-                            <p style="color: #FF0000;">{{ replacedText_Msg }}</p>
-                        {% endif %}
+                    {% endif %}
+                </form>
+                <!-- Image Preview -->
+                {% if img %}
+                    <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
+                {% endif %}
+            </div>
 
-                        <!-- Image Preview -->
-                        {% if img %}
-                            <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
-                        {% endif %}
-                    </form>
-                </div>
-
-                <div id="deleteSection" style="display: none;">
-                    <h3>Delete Text</h3>
-                    <form action="removeText" method="POST">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="removeText" name="removeText" value="Enter text to be removed" onfocus="this.value='{{ removedText }}'">
+            <div id="replaceSection" style="display: none;">
+                <h3>Replace Text</h3>
+                <form action="/replaceText" method="POST">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="replaceText" name="replaceText"
+                               value="Enter text to be replaced" onfocus="this.value='{{ replaceText }}'">
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="replacementText" name="replacementText"
+                               value="Enter text to replace with" onfocus="this.value='{{ replacementText }}'">
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <button type="submit" class="btn btn-primary me-2">Replace</button>
+                        <button type="submit" class="btn btn-primary" formaction="/replaceAllText">Replace All</button>
+                    </div>
+                    {% if replaceText %}
+                        <br/>
+                        <div class="d-flex justify-content-center">
+                            <div class="replaceTextDiv"> {{ replaceText }} </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Remove</button>
-                        {% if deletedText %}
-                            <p style="color: #FF0000;">{{ deletedText }}</p>
-                        {% endif %}
+                    {% endif %}
+                </form>
 
-                        <!-- Image Preview -->
-                        {% if img %}
-                            <img id="imgPreview" class="img-preview" src="{{img}}" alt="Image Preview">
-                        {% endif %}
-                    </form>
-                </div>
+                <!-- Image Preview -->
+                {% if replaced_img %}
+                    <div class="container">
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div>
+                                    <h4>Original Image</h4>
+                                    <hr/>
+                                    <img id="imgPreview" class="img-preview" src="{{ img }}"
+                                         alt="Original Image">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <h4>Replaced Text Image</h4>
+                                    <hr/>
+                                    <img id="imgPreview" class="img-preview" src="{{ replaced_img }}" alt="Labeled Image">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif img %}
+                    <img id="imgPreview" class="img-preview" src="{{ img }}" alt="Image Preview">
+                {% endif %}
+            </div>
+
+            <div id="deleteSection" style="display: none;">
+                <h3>Delete Text</h3>
+                <form action="removeText" method="POST">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="removeText" name="removeText"
+                               value="Enter text to be removed" onfocus="this.value='{{ removedText }}'">
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <button type="submit" class="btn btn-primary me-2">Remove</button>
+                        <button type="submit" class="btn btn-primary" formaction="/removeAllText">Remove All</button>
+                    </div>
+                    {% if deletedText %}
+                        <br/>
+                        <div class="d-flex justify-content-center">
+                            <div class="deleteTextDiv"> {{ deletedText }} </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Image Preview -->
+                    {% if deleted_img %}
+                        <div class="container">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div>
+                                        <h4>Original Image</h4>
+                                        <hr/>
+                                        <img id="imgPreview" class="img-preview" src="{{ img }}"
+                                             alt="Original Image">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div>
+                                        <h4>Deleted Text Image</h4>
+                                        <hr/>
+                                        <img id="imgPreview" class="img-preview" src="{{ deleted_img }}" alt="Labeled Image">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif img %}
+                        <img id="imgPreview" class="img-preview" src="{{ img }}" alt="Image Preview">
+                    {% endif %}
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-   <script>
+<script>
     // Function to show only the relevant section
     function showSection(sectionId) {
         // Hide all sections
@@ -277,7 +367,7 @@
         // Show the selected section
         document.getElementById(sectionId).style.display = 'block';
 
-         // Remove the active class from all links
+        // Remove the active class from all links
         const links = document.querySelectorAll('.sidebar a');
         links.forEach(link => link.classList.remove('active'));
 
@@ -289,11 +379,12 @@
     }
 
     // Call showSection with the current section when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const currentSection = "{{ currentSection | default('uploadSection') }}";
         showSection(currentSection);
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 
 </body>

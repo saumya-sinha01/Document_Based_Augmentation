@@ -17,7 +17,7 @@ class Data_Augmentation:
         self.reconstruct_table(text_coordinates, original_image, text_to_be_removed)
         # Show the image
         # original_image.show()
-        # print("Displaying the modified image..")
+        # print("Displaying the modified image...")
         original_image_filename = self.getFileName(original_image_file)
         augmented_image_filepath = self.image_upload_folder + original_image_filename + '_deleted.png'
         #Create the deleted image.

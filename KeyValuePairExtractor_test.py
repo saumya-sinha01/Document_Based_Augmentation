@@ -8,7 +8,7 @@ processor = LayoutLMv3Processor.from_pretrained(model_name)
 model = LayoutLMv3ForTokenClassification.from_pretrained(model_name)
 
 # Load and preprocess the document image
-image_path = "D:\\PycharmProjects\\Document_Based_Augmentation\\Document_Based_Augmentation\\static\\uploads\\test_image_1.jpg"  # Replace with your image path
+image_path = "/static/uploads/test_image_4.jpg"  # Replace with your image path
 image = Image.open(image_path)
 
 # Preprocess the image for the model
@@ -65,5 +65,5 @@ for key, value in key_value_pairs:
     draw.text((value_box[0], value_box[1]), value, fill="blue")
 
 # Save or display the annotated image
-# image.save("D:\\PycharmProjects\\Document_Based_Augmentation\\Document_Based_Augmentation\\static\\uploads\\test_image_1.jpg")
+# image.save("D:\\PycharmProjects\\Document_Based_Augmentation\\Document_Based_Augmentation\\static\\uploads\\test_image_4.jpg")
 image.show()

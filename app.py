@@ -20,7 +20,7 @@ def upload_file():
         input_image = os.path.join(app.config['UPLOAD'], filename)
 
         # Process the image with your extraction logic
-        textExtraction.processImage(input_image)
+        textExtraction.processImageV2(input_image)
 
         # Render the template with the uploaded image
         return render_template('image_render.html', img=input_image)
@@ -46,64 +46,75 @@ def displayKeyValuePairs():
 def search():
     searchText = request.form['searchText']
     input_image = textExtraction.input_image
+    image_found, searched_image = textExtraction.search(searchText)
 
-    if textExtraction.search(searchText):
-        return render_template('image_render.html', foundText='Text Found!', img=input_image, searchText=searchText, currentSection='searchSection')
+    if image_found:
+        return render_template('image_render.html', foundText='Text Found!', img=searched_image, searchText=searchText, currentSection='searchSection')
     else:
         return render_template('image_render.html', foundText='Not Found!', img=input_image, searchText=searchText, currentSection='searchSection')
 
 
-# @app.route('/searchtext', methods=['POST'])
-# def search():
-#     searchText = request.form['searchText']
-#     input_image = textExtraction.input_image
-#
-#     if textExtraction.search(searchText):
-#         return render_template('image_render.html', foundText='Text Found!', img=input_image, searchText=searchText)
-#     else:
-#         return render_template('image_render.html', foundText='Not Found!', img=input_image, searchText=searchText)
+@app.route('/replaceText', methods=['POST'])
+def replace():
+    input_image = textExtraction.input_image
+    input_text = request.form['replaceText']
+    replacement_text = request.form['replacementText']
+
+    isReplaced, orig_img_visualized_filename, orig_img_replaced_text_filename = textExtraction.replace(input_text, replacement_text, False)
+
+    if isReplaced:
+        return render_template('image_render.html', replaceText='Text Replaced!', img=orig_img_visualized_filename,
+                               replaced_img=orig_img_replaced_text_filename, currentSection='replaceSection')
+    else:
+        return render_template('image_render.html', replaceText='Input Text Not Found!', img=input_image,
+                               replaced_img=None, currentSection='replaceSection')
+
+@app.route('/replaceAllText', methods=['POST'])
+def replaceAllText():
+    input_image = textExtraction.input_image
+    input_text = request.form['replaceText']
+    replacement_text = request.form['replacementText']
+
+    isReplaced, orig_img_visualized_filename, augmented_img_visualized_filename = textExtraction.replace(input_text, replacement_text, True)
+
+    if isReplaced:
+        return render_template('image_render.html', replaceText='Text Replaced!', img=orig_img_visualized_filename,
+                               replaced_img=augmented_img_visualized_filename, currentSection='replaceSection')
+    else:
+        return render_template('image_render.html', replaceText='Input Text Not Found!', img=input_image,
+                               replaced_img=None, currentSection='replaceSection')
+
 
 @app.route('/removeText', methods=['POST'])
 def remove():
-    text_to_be_removed = request.form['removeText']
-    full_json_data = textExtraction.full_image_json
-    full_image_path = textExtraction.input_image
+    input_text = request.form['removeText']
+    input_image = textExtraction.input_image
+    isDeleted, orig_img_visualized_filename, augmented_img_visualized_filename = textExtraction.deleteText(input_text)
 
-    augmented_image_filepath = data_Augmentation.removeTextFromFullImage(text_to_be_removed, full_json_data, full_image_path)
-    return render_template('image_render.html', deletedText='Deleted All Occurrences!',
-                           removedText=text_to_be_removed, img=full_image_path, editedImg=augmented_image_filepath)
+    if isDeleted:
+        return render_template('image_render.html', deletedText='Text Deleted!', img=orig_img_visualized_filename,
+                               deleted_img=augmented_img_visualized_filename, currentSection='deleteSection')
+    else:
+        return render_template('image_render.html', deletedText='Text to delete not found!', img=input_image,
+                               deleted_img=None, currentSection='deleteSection')
 
-@app.route('/replaceText', methods=['POST'])
-def replace():
-    text_to_be_replaced = request.form['replaceText']
-    full_json_data = textExtraction.full_image_json
-    full_image_path = textExtraction.input_image
-    replacement_text = request.form['replacementText']
-    augmented_image_path_replacement = data_Augmentation.replaceText(text_to_be_replaced, full_json_data, full_image_path, replacement_text)
-    return render_template('image_render.html', replacedText_Msg='Replaced Occurrence!', replacementText=replacement_text,
-                           replaceText=text_to_be_replaced, img=full_image_path, editedImg=augmented_image_path_replacement)
+@app.route('/removeAllText', methods=['POST'])
+def removeAllText():
+    input_text = request.form['removeText']
+    input_image = textExtraction.input_image
+    isDeleted, orig_img_visualized_filename, augmented_img_visualized_filename = textExtraction.deleteText(input_text, True)
 
-@app.route('/replaceAllText', methods=['POST'])
-def replaceAll():
-    text_to_be_replacedAll = request.form['replaceAllText']
-    full_json_data = textExtraction.full_image_json
-    full_image_path = textExtraction.input_image
-    replacementAll_text = request.form['replacementAllText']
-    augmented_image_path_replacementAll = data_Augmentation.replaceAllText(text_to_be_replacedAll, full_json_data,
-                                                                           full_image_path, replacementAll_text)
-    return render_template('image_render.html', replacedAllText_Msg='Replaced All Occurrences!',
-                           replacementAllText=replacementAll_text,
-                           replaceAllText=text_to_be_replacedAll, img=full_image_path,
-                           editedImg=augmented_image_path_replacementAll)
+    if isDeleted:
+        return render_template('image_render.html', deletedText='Text Deleted!', img=orig_img_visualized_filename,
+                               deleted_img=augmented_img_visualized_filename, currentSection='deleteSection')
+    else:
+        return render_template('image_render.html', deletedText='Text to delete not found!', img=input_image,
+                               deleted_img=None, currentSection='deleteSection')
 
-# @app.route('/KVPSearch', methods=['POST'])
-# def kvp_search():
-#     key_value_pairs = textExtraction.display_key_value_pairs()
-#     return render_template('image_render.html', key_value_pairs=key_value_pairs, img=textExtraction.input_image)
-@app.route('/KVPSearch', methods=['POST'])
-def kvp_search():
-    key_value_pairs = textExtraction.display_key_value_pairs()
-    return render_template('image_render.html', key_value_pairs=key_value_pairs, img=textExtraction.input_image, currentSection='kvpSection')
+@app.route('/getLatestImage', methods=['GET'])
+def getLatestImage():
+    input_image = textExtraction.input_image
+    # Render the template with the uploaded image
+    return render_template('image_render.html', img=input_image)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+

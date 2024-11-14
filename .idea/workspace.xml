@@ -4,20 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="29842d99-488f-46ac-a5be-c1740b1edd0a" name="Changes" comment="Key value pair feature">
-      <change afterPath="$PROJECT_DIR$/KeyValuePairExtractor_test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/uploads/test_image_1_1_1_labeled.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/uploads/test_image_2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/uploads/test_image_2_1_1.png" afterDir="false" />
+    <list default="true" id="29842d99-488f-46ac-a5be-c1740b1edd0a" name="Changes" comment="Key value pair feature and search feature to the new UI.">
+      <change afterPath="$PROJECT_DIR$/static/uploads/test_image_3.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/uploads/test_image_3_labeled.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data_Augmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Data_Augmentation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KeyValuePairExtractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyValuePairExtractor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KeyValuePairExtractor_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyValuePairExtractor_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TextExtraction.py" beforeDir="false" afterPath="$PROJECT_DIR$/TextExtraction.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/editedfrom_Simplefrom_MultiText.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/editedfrom_Simplefrom_MultiText_1_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/form_image_png.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/uploads/test_image_1.jpg_1_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/uploads/test_image_1_1_1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/test_image_1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/test_image_1.jpg_1_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/test_image_1_1_1_labeled.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/test_image_2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/uploads/test_image_2_1_1.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/image_render.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/image_render.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,35 +58,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;Flask server.Document_Based_Augmentation.executor&quot;: &quot;Run&quot;,
-    &quot;Flask server.Flask (app.py) (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Flask server.Flask (app.py).executor&quot;: &quot;Run&quot;,
-    &quot;Python.KeyValuePairExtractor (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.KeyValuePairExtractor.executor&quot;: &quot;Run&quot;,
-    &quot;Python.KeyValuePairExtractor_test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TextExtraction.executor&quot;: &quot;Run&quot;,
-    &quot;Python.kp.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/PycharmProjects/Document_Based_Augmentation/Document_Based_Augmentation&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Flask server.Document_Based_Augmentation.executor": "Run",
+    "Flask server.Flask (app.py) (1).executor": "Run",
+    "Flask server.Flask (app.py).executor": "Debug",
+    "Python.KeyValuePairExtractor (1).executor": "Run",
+    "Python.KeyValuePairExtractor.executor": "Run",
+    "Python.KeyValuePairExtractor_test.executor": "Run",
+    "Python.TextExtraction.executor": "Run",
+    "Python.kp.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/PycharmProjects/Document_Based_Augmentation/Document_Based_Augmentation/static/uploads",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\PycharmProjects\Document_Based_Augmentation\Document_Based_Augmentation\static\uploads" />
       <recent name="D:\PycharmProjects\Document_Based_Augmentation\Document_Based_Augmentation" />
     </key>
   </component>
-  <component name="RunManager" selected="Flask server.Flask (app.py)">
+  <component name="RunManager" selected="Flask server.Flask (app.py) (1)">
     <configuration name="KeyValuePairExtractor (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Document_Based_Augmentation" />
       <option name="ENV_FILES" value="" />
@@ -224,19 +225,51 @@
       <option name="launchJavascriptDebuger" value="false" />
       <method v="2" />
     </configuration>
+    <configuration name="Flask (app.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
+      <module name="Document_Based_Augmentation" />
+      <option name="target" value="$PROJECT_DIR$/app.py" />
+      <option name="targetType" value="PATH" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Flask (app.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
+      <module name="Document_Based_Augmentation" />
+      <option name="target" value="$PROJECT_DIR$/app.py" />
+      <option name="targetType" value="PATH" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
     <list>
-      <item itemvalue="Python.KeyValuePairExtractor (1)" />
-      <item itemvalue="Python.KeyValuePairExtractor" />
-      <item itemvalue="Python.KeyValuePairExtractor_test" />
       <item itemvalue="Flask server.Document_Based_Augmentation" />
       <item itemvalue="Flask server.Flask (app.py) (1)" />
       <item itemvalue="Flask server.Flask (app.py)" />
+      <item itemvalue="Python.KeyValuePairExtractor (1)" />
+      <item itemvalue="Python.KeyValuePairExtractor" />
+      <item itemvalue="Python.KeyValuePairExtractor_test" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Flask server.Flask (app.py)" />
         <item itemvalue="Flask server.Flask (app.py) (1)" />
         <item itemvalue="Python.KeyValuePairExtractor (1)" />
+        <item itemvalue="Flask server.Flask (app.py)" />
         <item itemvalue="Python.KeyValuePairExtractor_test" />
         <item itemvalue="Python.KeyValuePairExtractor" />
       </list>
@@ -286,6 +319,13 @@
       <workItem from="1723269148412" duration="1549000" />
       <workItem from="1723506323989" duration="16247000" />
       <workItem from="1724037793513" duration="30398000" />
+      <workItem from="1724711781349" duration="119000" />
+      <workItem from="1725389759111" duration="4480000" />
+      <workItem from="1725856159310" duration="69000" />
+      <workItem from="1725856382505" duration="22434000" />
+      <workItem from="1726715023434" duration="1771000" />
+      <workItem from="1728960329362" duration="26304000" />
+      <workItem from="1731465641564" duration="26000000" />
     </task>
     <task id="LOCAL-00001" summary="committing">
       <option name="closed" value="true" />
@@ -335,7 +375,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720117756636</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Key value pair feature and search feature to the new UI.">
+      <option name="closed" value="true" />
+      <created>1724711854381</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1724711854381</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -349,7 +397,8 @@
     <MESSAGE value="Fully functional working code with removal feature." />
     <MESSAGE value="Replace All functionality" />
     <MESSAGE value="Key value pair feature" />
-    <option name="LAST_COMMIT_MESSAGE" value="Key value pair feature" />
+    <MESSAGE value="Key value pair feature and search feature to the new UI." />
+    <option name="LAST_COMMIT_MESSAGE" value="Key value pair feature and search feature to the new UI." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -420,49 +469,34 @@
           <option name="timeStamp" value="144" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>36</line>
-          <option name="timeStamp" value="153" />
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>58</line>
+          <option name="timeStamp" value="229" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/KeyValuePairExtractor_test.py</url>
-          <line>25</line>
-          <option name="timeStamp" value="170" />
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>73</line>
+          <option name="timeStamp" value="253" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>94</line>
-          <option name="timeStamp" value="176" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="177" />
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>74</line>
+          <option name="timeStamp" value="254" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>61</line>
-          <option name="timeStamp" value="180" />
+          <line>164</line>
+          <option name="timeStamp" value="269" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>96</line>
-          <option name="timeStamp" value="181" />
+          <line>160</line>
+          <option name="timeStamp" value="270" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>159</line>
-          <option name="timeStamp" value="183" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>99</line>
-          <option name="timeStamp" value="189" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/TextExtraction.py</url>
-          <line>103</line>
-          <option name="timeStamp" value="191" />
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>117</line>
+          <option name="timeStamp" value="272" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -476,6 +510,7 @@
     <watches-manager>
       <configuration name="Python.FlaskServer">
         <watch expression="text_to_be_removed" />
+        <watch expression="text_to_be_removed" />
       </configuration>
     </watches-manager>
   </component>
@@ -484,8 +519,8 @@
     <SUITE FILE_PATH="coverage/Document_Based_Augmentation$KeyValuePairExtractor_test.coverage" NAME="KeyValuePairExtractor_test Coverage Results" MODIFIED="1724042182726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Document_Based_Augmentation$Document_Based_Augmentation.coverage" NAME="Document_Based_Augmentation Coverage Results" MODIFIED="1713433774727" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Document_Based_Augmentation$kp.coverage" NAME="kp Coverage Results" MODIFIED="1719716989559" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Document_Based_Augmentation$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1724617753601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Document_Based_Augmentation$KeyValuePairExtractor__1_.coverage" NAME="KeyValuePairExtractor (1) Coverage Results" MODIFIED="1724043613938" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Document_Based_Augmentation$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1731548878979" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Document_Based_Augmentation$KeyValuePairExtractor__1_.coverage" NAME="KeyValuePairExtractor (1) Coverage Results" MODIFIED="1731475679550" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Document_Based_Augmentation$Flask__app_py___1_.coverage" NAME="Flask (app.py) (1) Coverage Results" MODIFIED="1724052987107" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Document_Based_Augmentation$KeyValuePairExtractor.coverage" NAME="KeyValuePairExtractor Coverage Results" MODIFIED="1719716932693" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

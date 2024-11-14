@@ -1,19 +1,26 @@
 import os, cv2, json, re
+import time
+import math
+from pathlib import Path
 from collections import defaultdict
 import pytesseract
-from doctr.io import DocumentFile
 from doctr.models import ocr_predictor
-from ultralyticsplus import YOLO, render_result
+from ultralyticsplus import YOLO
+from bisect import bisect_left
 from PIL import Image, ImageDraw, ImageFont
 
 from KeyValuePairExtractor import KeyValuePairExtractor
 
-
 class TextExtraction:
 
     input_image = None
+    orig_width = None
+    orig_height = None
+
     def __init__(self):
-        self.image_upload_folder = 'static\\uploads\\'
+        self.image_upload_folder  = 'static\\uploads\\'
+        self.image_search_folder  = 'static\\search\\'
+        self.image_replace_folder = 'static\\replace\\'
         os.environ['USE_TORCH'] = '1'
 
         self.extracted_json_list = []
@@ -33,8 +40,12 @@ class TextExtraction:
         self.predictor = ocr_predictor(pretrained=True)
         self.kvExtractor = KeyValuePairExtractor()
 
-    def processImage(self, input_image):
+    '''
+    This function parses the uploaded image and extracts text from it. It saves the extracted key-value pairs into a dictionary: self.dict
+    '''
+    def processImageV2(self, input_image):
         self.input_image = input_image
+        self.input_image_extension = os.path.splitext(input_image)[1].lower()
 
         #Reset State:
         self.extracted_json_list = []
@@ -42,13 +53,6 @@ class TextExtraction:
         self.labeled_images = []
         self.cropped_image_files = []
         self.full_image_json = None
-
-        #Extract json text for the full image..
-        self.full_image_json = self.extractText(input_image)
-
-        #Crop Images to predict the table..
-        # perform inference
-        results = self.yolo_model.predict(input_image)
 
         #Load the image:
         original_image = cv2.imread(input_image)
@@ -58,164 +62,308 @@ class TextExtraction:
         image_file_name = image_file_name.replace(self.image_upload_folder, '').replace('.jpg', '')
         image_file_name = image_file_name.replace(self.image_upload_folder, '').replace('.jpeg', '')
 
+        #Save the image file name too for later use.
+        self.image_file_name = image_file_name
+
         #Get the original width and height.
         orig_width, orig_height, channels = original_image.shape
+        self.orig_width = orig_width
+        self.orig_height = orig_height
 
-        result_count = 0
-        box_count = 0
+        # Extract the key value pairs for cropped image...
+        extractedKVPairs, bboxes, labeled_image = self.kvExtractor.extract_key_value_pair_from_image_path(input_image)
+        self.extracted_key_value_pairs.append(extractedKVPairs)
 
-        #Extract text from cropped images...
-        for result in results:
-            result_count += 1
+        labeled_image_filename = self.image_upload_folder + image_file_name + '_labeled.png'
 
-            # render = render_result(model=self.yolo_model, image=input_image, result=result)
-            # render.show()
+        # Resize the image.
+        resized_image = labeled_image.resize((orig_height, orig_width))
+        resized_image.save(labeled_image_filename)
+        self.labeled_images.append(labeled_image_filename)
 
-            for captured_box in result.boxes:
-                box_count += 1
-                box = captured_box.xyxy
+        #Update the dictionary...
+        self.parse_extracted_json(extractedKVPairs, bboxes)
 
-                # Extract the coordinates of the top-left and bottom-right corners
-                x1, y1, x2, y2 = map(int, box[0])
-                cropped_image = original_image[y1:y2, x1:x2]
-
-                # Save or display the cropped image
-                cropped_image_filename = self.image_upload_folder + image_file_name + '_' + str(result_count) + '_' + str(box_count) + '.png'
-                cv2.imwrite(cropped_image_filename, cropped_image)
-                # render_result(model=self.yolo_model, image=cropped_image, result=result).show()
-
-                #Extract the key value pairs for cropped image...
-                extractedKVPairs, labeled_image = self.kvExtractor.extract_key_value_pair(cropped_image_filename)
-                self.extracted_key_value_pairs.append(extractedKVPairs)
-
-                labeled_image_filename = self.image_upload_folder + image_file_name + '_' + str(result_count) + '_' + str(box_count) + '_labeled.png'
-                #Resize the image.
-                resized_image = labeled_image.resize((orig_height, orig_width))
-                resized_image.save(labeled_image_filename)
-                self.labeled_images.append(labeled_image_filename)
-
-                extracted_json = self.extractText(cropped_image_filename)
-                self.extracted_json_list.append(extracted_json)
-                self.cropped_image_files.append(cropped_image_filename)
-                self.parse_extracted_json(extracted_json)
-
-
+    '''
+    This function searches for the input text into the dictionary and if present creates a new image with the search text highlighted within boundaries.
+    '''
     def search(self, searchText):
         if not searchText:
             return False
 
         lowercaseSearchText = searchText.lower()
+        searched_image = Image.open(self.input_image).convert("RGB").copy()
         if lowercaseSearchText in self.dict:
-            # valueMap = self.dict[lowercaseSearchText][0]
-            # geometry = valueMap['geometry']
-            # coordinates = [geometry[0][0], geometry[0][1], geometry[1][0], geometry[1][1]]
-            # searched_image = self.visualize_image(self.input_image, searchText, coordinates)
-            # searchedImage = visualize_ima
-            return True
+            #Remove all the old search files...
+            self.delete_old_images(self.image_search_folder)
+            #Perform search...
+            coordinatesList = self.dict[lowercaseSearchText]
+            for coordinates in coordinatesList:
+                searched_image = self.highlight_text_within_image_for_single_coordinate(searched_image, coordinates)
 
-        return False
+            filename = self.save_searched_image(searched_image)
+            return True, filename
+        return False, None
 
-    def parse_extracted_json(self, extracted_json):
+    def replace(self, input_text, replacement_text, replace_all):
+        if not input_text:
+            return False
+
+        #Get the position of replacement_text in the self.dictionary for later use in highlighting.
+        replacement_text_coordinate_list = []
+        if replacement_text.lower() in self.dict:
+            replacement_text_coordinate_list = self.dict[replacement_text.lower()]
+
+        lowercaseInputText = input_text.lower()
+        if lowercaseInputText in self.dict:
+            self.delete_old_images(self.image_replace_folder)
+            # Get the co-ordinates list of the test found so far.
+            coordinatesList = self.dict[lowercaseInputText]
+            if replace_all:
+                original_image_copy = Image.open(self.input_image).convert("RGB").copy()
+                augmented_image = original_image_copy.copy()
+                for text_coordinate in coordinatesList:
+                    # Highlight input_text for every text co-ordinate in the original image.
+                    original_image_copy = self.highlight_text_within_image_for_single_coordinate(original_image_copy, text_coordinate)
+                    # Perform replace operation for every text co-ordinate. Returns a new image
+                    augmented_image = self.replaceText(replacement_text, text_coordinate, augmented_image)
+
+                #Once updated, perform the following steps:
+                # Update the dictionary and the input image.
+                self.update_image(augmented_image)
+
+                # Highlight the replaced text in augmented image.
+                augmented_image_visualized = self.highlight_text_within_image(augmented_image, replacement_text, True)
+
+                # Save the augmented image and original highlighted image to be returned.
+                orig_img_visualized_filename = self.save_replaced_text_image(original_image_copy)
+                augmented_img_visualized_filename = self.save_replaced_text_image(augmented_image_visualized)
+                return True, orig_img_visualized_filename, augmented_img_visualized_filename
+            else:
+                # Pick the first co-ordinate from the list.
+                first_coordinate = coordinatesList[0]
+
+                #Find the position which will be helpful for insertion.
+                coordinate_position = self.find_insert_position(replacement_text_coordinate_list, first_coordinate)
+
+                #Create a copy of the original image to be used for replace operation.
+                original_image_copy = Image.open(self.input_image).convert("RGB").copy()
+                orig_img_visualized = self.highlight_text_within_image_for_single_coordinate(original_image_copy, first_coordinate)
+
+                #Perform replace operation. Returns a new image.
+                augmented_image = Image.open(self.input_image).convert("RGB").copy()
+                augmented_image = self.replaceText(replacement_text, first_coordinate, augmented_image)
+
+                # Update the dictionary and the input image.
+                self.update_image(augmented_image)
+
+                #Highlight the input and replaced text.
+                augmented_image_visualized = self.highlight_text_within_image(augmented_image, replacement_text, False, coordinate_position)
+
+                #Save the augmented image and original highlighted image to be returned.
+                orig_img_visualized_filename = self.save_replaced_text_image(orig_img_visualized)
+                augmented_img_visualized_filename = self.save_replaced_text_image(augmented_image_visualized)
+
+                return True, orig_img_visualized_filename, augmented_img_visualized_filename
+
+        return False, None, None
+
+    def deleteText(self, input_text, delete_all=False):
+        if not input_text:
+            return False
+
+        input_text = input_text.lower()
+        if input_text in self.dict:
+
+            if delete_all:
+                #Perform some logic here.
+                coordinatesList = self.dict[input_text]
+                original_image_copy = Image.open(self.input_image).convert("RGB").copy()
+                augmented_image = Image.open(self.input_image).convert("RGB").copy()
+
+                for text_coordinate in coordinatesList:
+                    # Highlight input_text for every text co-ordinate in the original image.
+                    original_image_copy = self.highlight_text_within_image_for_single_coordinate(original_image_copy, text_coordinate)
+                    # Perform replace operation for every text co-ordinate. Returns a new image
+                    augmented_image = self.reconstruct_table(text_coordinate, augmented_image)
+
+                # Once updated, perform the following steps:
+                # Update the dictionary and the input image.
+                self.update_image(augmented_image)
+
+                # Save the augmented image and original highlighted image to be returned.
+                orig_img_visualized_filename = self.save_replaced_text_image(original_image_copy)
+                augmented_img_visualized_filename = self.save_replaced_text_image(augmented_image)
+                return True, orig_img_visualized_filename, augmented_img_visualized_filename
+
+            else:
+                # Pick the first co-ordinate from the list.
+                coordinatesList = self.dict[input_text]
+                first_coordinate = coordinatesList[0]
+
+                # Create a copy of the original image to be used for replace operation.
+                original_image_copy = Image.open(self.input_image).convert("RGB").copy()
+                orig_img_visualized = self.highlight_text_within_image_for_single_coordinate(original_image_copy, first_coordinate)
+
+                # Perform replace operation. Returns a new image.
+                augmented_image = Image.open(self.input_image).convert("RGB").copy()
+                augmented_image = self.reconstruct_table(first_coordinate, augmented_image)
+
+                # Update the dictionary and the input image.
+                self.update_image(augmented_image)
+
+                # Save the augmented image and original highlighted image to be returned.
+                orig_img_visualized_filename = self.save_replaced_text_image(orig_img_visualized)
+                augmented_img_visualized_filename = self.save_replaced_text_image(augmented_image)
+
+                return True, orig_img_visualized_filename, augmented_img_visualized_filename
+
+        return False, None, None
+
+    #Function to replace text based on searched text. Returns a new image.
+    def replaceText(self, replacement_text, text_coordinates, input_image):
+            # Reconstruct the table and overlay the edited text
+            left, bottom, right, top = text_coordinates
+            input_image_copy = self.reconstruct_table(text_coordinates, input_image)
+            # Overlay the edited text on top of the white box with Times New Roman font and blue color
+            font = ImageFont.truetype("times.ttf", size=15)  # Times New Roman font, adjust size as needed
+            self.overlay_text(input_image_copy, replacement_text, (left - 0.5, bottom - 0.5), font=font, fill="#000000")  # Black color
+            return input_image_copy
+
+    def overlay_text(self, image, text, position, font=None, fill="black"):
+        self.draw = ImageDraw.Draw(image)
+        if font is None:
+            font = ImageFont.load_default()  # Default font
+        self.draw.text(position, text, font=font, fill=fill)
+
+    def reconstruct_table(self, text_coordinates, input_image):
+        # Extract bounding box coordinates
+        left, bottom, right, top = text_coordinates
+        # Calculate the width and height of the text box
+        width = math.ceil(right - left) + 1
+        height = math.ceil(top - bottom) + 1
+        # Create a white rectangle to cover the existing text
+        white_box = Image.new("RGB", (width, height), color="white")
+
+        # original_image_copy = Image.open(self.input_image).convert("RGB").copy()
+        # original_image_copy.paste(white_box, (left, bottom))
+
+        input_image_copy = input_image.convert("RGB").copy()
+        input_image_copy.paste(white_box, (math.floor(left), math.floor(bottom)))
+
+        return input_image_copy
+
+    def parse_extracted_json(self, extractedKVPairs, bboxes):
         self.dict = defaultdict()
-        dict = json.loads(extracted_json)
-        value_dict = dict['pages'][0]
-        block_list = value_dict['blocks']
-        for block_value in block_list:
-            word_dict_list = block_value['lines'][0]
-            word_list = word_dict_list['words']
-            for word_dict in word_list:
-                word_value = word_dict['value'].lower()
-                if word_value in self.dict:
-                    self.dict[word_value].append(word_dict)
+        for idx in range(0, len(extractedKVPairs)):
+            tuple = extractedKVPairs[idx]
+            word_value = tuple['value']
+            word_value = str(word_value).lower()
+
+            coord = bboxes[idx]
+            if word_value in self.dict:
+                self.dict[word_value].append(coord)
+            else:
+                self.dict[word_value] = list()
+                self.dict[word_value].append(coord)
+
+    def highlight_text_within_image(self, image, text, highlight_all = False, coordinate_position = 0):
+        highlighted_image = image
+        if text.lower() in self.dict:
+            coordinatesList = self.dict[text.lower()]
+            if highlight_all:
+                for coordinates in coordinatesList:
+                    highlighted_image = self.highlight_text_within_image_for_single_coordinate(highlighted_image, coordinates)
+            else:
+                if len(coordinatesList) > coordinate_position:
+                    highlighted_image = self.highlight_text_within_image_for_single_coordinate(highlighted_image, coordinatesList[coordinate_position])
                 else:
-                    self.dict[word_value] = [word_dict]
+                    highlighted_image = self.highlight_text_within_image_for_single_coordinate(highlighted_image, coordinatesList[0])
 
-    def extractText(self, cropped_table_image):
-        # Read the file
-        doc = DocumentFile.from_images(cropped_table_image)
+        return highlighted_image
 
-        # Perform OCR on the document
-        result = self.predictor(doc)
+    def highlight_text_within_image_for_single_coordinate(self, image, coordinates):
+        try:
+            draw = ImageDraw.Draw(image)
 
-        # JSON export
-        json_export = result.export()
+            # Ensure coordinates are valid
+            if len(coordinates) != 4:
+                raise ValueError("Coordinates must contain exactly 4 values (x1, y1, x2, y2).")
 
-        # Fields to remove
-        fields_to_remove = ['confidence', 'page_idx', 'orientation', 'language', 'artefacts']
+            coord = [(coordinates[0], coordinates[1]), (coordinates[2], coordinates[3])]
 
-        # Remove the specified fields
-        self.remove_fields(json_export, fields_to_remove)
+            # Drawing rectangle and text
+            draw.rectangle(coord, outline='green')
 
-        # Remove 'geometry' from 'blocks' and 'lines'
-        for page in json_export['pages']:
-            for block in page['blocks']:
-                if 'geometry' in block:
-                    del block['geometry']
-                for line in block.get('lines', []):
-                    if 'geometry' in line:
-                        del line['geometry']
+            return image
 
-        # Convert the modified data back to JSON
-        modified_json_full = json.dumps(json_export, separators=(',', ':'))
-        return modified_json_full
+        except ValueError as ve:
+            print(f"ValueError: {ve}")
+            return None
 
-    # Define a function to remove fields recursively
-    def remove_fields(self, obj, fields):
-        if isinstance(obj, list):
-            for item in obj:
-                self.remove_fields(item, fields)
-        elif isinstance(obj, dict):
-            for key in list(obj.keys()):
-                if key in fields:
-                    del obj[key]
-                else:
-                    self.remove_fields(obj[key], fields)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
 
-    # Function to remove 'geometry' key from 'blocks' and 'lines'
-    def remove_geometry(self, data):
-        if isinstance(data, list):
-            for item in data:
-                self.remove_geometry(item)
-        elif isinstance(data, dict):
-            if 'geometry' in data:
-                del data['geometry']
-            for key, value in data.items():
-                self.remove_geometry(value)
+    def save_searched_image(self, searched_image):
+        timestamp = time.time()
+        image_file_name = "search_" + str(timestamp)
+        labeled_image_filename = self.image_search_folder + image_file_name + '.png'
+        resized_searched_image = searched_image.resize((self.orig_height, self.orig_width))
+        resized_searched_image.save(labeled_image_filename)
+        return labeled_image_filename
 
-    def extract_key_value_pairs(self, text):
-        lines = text.split('\n')
-        kvp = {}
-        key = None
+    def save_replaced_text_image(self, replaced_image):
+        timestamp = time.time()
+        image_file_name = "replaced_" + str(timestamp)
+        labeled_image_filename = self.image_replace_folder + image_file_name + '.png'
+        resized_replaced_image = replaced_image.resize((self.orig_height, self.orig_width))
+        resized_replaced_image.save(labeled_image_filename)
+        return labeled_image_filename
 
-        for line in lines:
-            if ':' in line:
-                parts = line.split(':', 1)
-                key = parts[0].strip()
-                value = parts[1].strip()
-                if key and value:
-                    kvp[key] = value
-            elif key:
-                kvp[key] += f' {line.strip()}'
+    def delete_old_images(self, folder_name):
+        # Iterate and delete all files in the directory
+        directory = Path(folder_name)
 
-        self.kvp = kvp
-        return kvp
+        for file_path in directory.glob('*'):
+            if file_path.is_file():
+                file_path.unlink()
+                print(f"Deleted: {file_path}")
 
-    def display_key_value_pairs(self):
-        text = pytesseract.image_to_string(self.input_image)
-        kvp = self.extract_key_value_pairs(text)
-        return kvp
+    def update_image(self, updated_image):
+        #Delete the old images.
+        self.delete_old_images(self.image_upload_folder)
 
-    def visualize_image(self, image, text, coordinates):
-        draw = ImageDraw.Draw(image)
-        font = ImageFont.load_default()
-        coord = [(coordinates[0], coordinates[1]), (coordinates[2], coordinates[3])]
-        draw.rectangle(coord, outline='red')
-        draw.text((coordinates[0] + 10, coordinates[1] - 10), text=text, fill='red', font=font)
-        return image
+        # Create a copy of the updated image for saving.
+        updated_image_copy = updated_image.convert("RGB").copy()
 
+        # Overwrite the original image with updated image...
+        original_image_filename = self.image_upload_folder + self.image_file_name + self.input_image_extension
+        updated_image_copy.save(original_image_filename)
 
+        # Extract the key value pairs for the updated image...
+        extractedKVPairs, bboxes, labeled_image = self.kvExtractor.extract_key_value_pair_from_image_path(original_image_filename)
+        self.extracted_key_value_pairs = []
+        self.extracted_key_value_pairs.append(extractedKVPairs)
 
+        # Resize and overwrite the labeled image.
+        labeled_image_filename =  self.image_upload_folder + self.image_file_name + '_labeled.png'
+        updated_image_copy = labeled_image.resize((self.orig_height, self.orig_width))
+        updated_image_copy.save(labeled_image_filename)
 
+        #Update the labeled image to be used in key value pairs functionality.
+        self.labeled_images = []
+        self.labeled_images.append(labeled_image_filename)
 
+        # Re-extract the json...
+        self.parse_extracted_json(extractedKVPairs, bboxes)
 
+    def find_insert_position(self, coords, new_coord):
+        # Extract only 'left' values for binary search
+        left_values = [coord[0] for coord in coords]
+        # Find the insertion index
+        index = bisect_left(left_values, new_coord[0])
+        return index
 
+#FileNotFoundError: [Errno 2] No such file or directory:
+#'D:\\PycharmProjects\\Document_Based_Augmentation\\Document_Based_Augmentation\\static\\uploads\\test_image_4.jpg'
