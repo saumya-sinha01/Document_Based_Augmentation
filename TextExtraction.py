@@ -105,6 +105,10 @@ class TextExtraction:
             return True, filename
         return False, None
 
+    '''
+    This function searches for the input text into the dictionary and if present replaces with the replacement_text. 
+    The argument 'replace_all decides' whether all instances should be replaced or just one. 
+    '''
     def replace(self, input_text, replacement_text, replace_all):
         if not input_text:
             return False

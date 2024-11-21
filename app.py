@@ -3,13 +3,11 @@ from werkzeug.utils import secure_filename
 import os
 
 from TextExtraction import TextExtraction
-from Data_Augmentation import Data_Augmentation
 
 app = Flask(__name__)
 upload_folder = os.path.join('static', 'uploads')
 app.config['UPLOAD'] = upload_folder
 textExtraction = TextExtraction()
-data_Augmentation = Data_Augmentation()
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
